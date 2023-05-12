@@ -1,26 +1,9 @@
-"""
-######################################################################
-
-VFD Control Over Modbus Code
-Coded By "The Intrigued Engineer" over a few coffees
-
-Minimal Modbus Library Documentation
-https://minimalmodbus.readthedocs.io/en/stable/
-
-Link to LS-M100 Datasheet:
-https://www.seva-tec.de/media/pdf/f5/58/72/SEVA-LS-M100-Manual-Frequency-Inverter.pdf
-
-Thanks For Watching!!!
-
-######################################################################
-"""
-
 ## Set the Modbus paramaters in here for both reading and writing to the VFD
 
 
 ## General Modbus Settings
 
-mb_address = 1							# Station Address
+mb_address = 3							# Station Address
 USB_port = "COM3"				# Location of USB to RS485 converter
 baudrate = 9600							# BaudRate
 bytesize = 8							# Number of data bits to be requested

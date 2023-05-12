@@ -1,22 +1,4 @@
-"""
-######################################################################
-
-VFD Control Over Modbus Code
-Coded By "The Intrigued Engineer" over a few coffees
-
-Minimal Modbus Library Documentation
-https://minimalmodbus.readthedocs.io/en/stable/
-
-Link to LS-M100 Datasheet:
-https://www.seva-tec.de/media/pdf/f5/58/72/SEVA-LS-M100-Manual-Frequency-Inverter.pdf
-
-Thanks For Watching!!!
-
-######################################################################
-"""
-
-
-	## Import the related modules / libraries
+## Import the related modules / libraries
 import minimalmodbus
 import Modbus_Settings as MB
 
@@ -27,7 +9,7 @@ turny_boi.mode = minimalmodbus.MODE_RTU
 turny_boi.serial.parity = minimalmodbus.serial.PARITY_NONE
 turny_boi.serial.baudrate = MB.baudrate
 turny_boi.serial.bytesize = MB.bytesize
-turny_boi.serial.stopbits = MB.stopbits		
+turny_boi.serial.stopbits = MB.stopbits
 turny_boi.serial.timeout  = MB.timeout
 turny_boi.clear_buffers_before_each_transaction = MB.clear_buffers_before_call
 turny_boi.close_port_after_each_call = MB.clear_buffers_after_call 
