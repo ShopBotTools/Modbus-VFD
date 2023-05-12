@@ -8,9 +8,6 @@ def read_VFD():
 	from time import sleep
 	import os
 
-	## Calculate what the register address that should be passed to minimal modbus should be
-	read_start = MB.reading_offset-40001
-
 	## Create reading "instrument" called "readie_boi" and import it's settings from the modbus settings module
 	readie_boi = minimalmodbus.Instrument(MB.USB_port,MB.mb_address )	
 	readie_boi.mode = minimalmodbus.MODE_RTU							
@@ -28,7 +25,7 @@ def read_VFD():
 		
 			## Poll the VFD and set the returned data as a list called "data"  
 		try:
-			data =readie_boi.read_registers(read_start, MB.read_length, 3) 
+			data =readie_boi.read_registers(MB.frequency_reg, MB.read_length, 3) 
 			readie_boi.serial.close()
 			
 			## Split out the list into individual variables
@@ -40,34 +37,34 @@ def read_VFD():
 			process = data[5]
 
 
-			## Check to see which opperation is currently underway ("process") and give the variable "opp" the correct string
-			if process == 24577:
-				opp = "Stopped"
-			elif process == 26642:
-				opp = "Accelerating In Forward"
-			elif process == 26690:
-				opp = "Running In Forward"
-			elif process == 24866:
-				opp = "Decelerating In Forward To Stop"
-			elif process == 26658:
-				opp = "Decelerating In Forward"
-			elif process == 28692:
-				opp = "Accelerating In Reverse"
-			elif process == 28740:
-				opp = "Running In Reverse"
-			elif process == 24868:
-				opp = "Decelerating In Reverse To Stop"
-			elif process == 28708:
-				opp = "Decelerating In Reverse"	
-			elif process == 28706:
-				opp = "Decelerating In Forward To Go To Reverse"
-			elif process == 26660:
-				opp = "Decelerating In Reverse To Go Forward"
-			else:
-				opp = "Unknown"
+# 			## Check to see which opperation is currently underway ("process") and give the variable "opp" the correct string
+# 			if process == 24577:
+# 				opp = "Stopped"
+# 			elif process == 26642:
+# 				opp = "Accelerating In Forward"
+# 			elif process == 26690:
+# 				opp = "Running In Forward"
+# 			elif process == 24866:
+# 				opp = "Decelerating In Forward To Stop"
+# 			elif process == 26658:
+# 				opp = "Decelerating In Forward"
+# 			elif process == 28692:
+# 				opp = "Accelerating In Reverse"
+# 			elif process == 28740:
+# 				opp = "Running In Reverse"
+# 			elif process == 24868:
+# 				opp = "Decelerating In Reverse To Stop"
+# 			elif process == 28708:
+# 				opp = "Decelerating In Reverse"	
+# 			elif process == 28706:
+# 				opp = "Decelerating In Forward To Go To Reverse"
+# 			elif process == 26660:
+# 				opp = "Decelerating In Reverse To Go Forward"
+# 			else:
+# 				opp = "Unknown"
 			
 			
-			## Print out a snazzy table with all the data
+# 			## Print out a snazzy table with all the data
 			
 			print("")
 			print("------------------------------------------")
@@ -81,33 +78,32 @@ def read_VFD():
 			print(f"Operation Code :  {process}")
 			print("------------------------------------------")
 			print("---------------------------------------------------------------")
-			print(f"Current Operation:- {opp}")
 			print("---------------------------------------------------------------")
 			print("")
 			
 			
-			## Debug section, Uncomment for more details on what is in each register address
-			# ~ print("")
-			# ~ print("--------------------")
-			# ~ print("Debug Section")
-			# ~ print("--------------------")
-			# ~ print("Data at address: ")
-			# ~ i = MB.reading_offset
-			# ~ for x in data:
-				# ~ print(f"Data in Address {i}: {x}")
-				# ~ i += 1
-			# ~ print("------------------------------------------")
+# 			## Debug section, Uncomment for more details on what is in each register address
+# 			# ~ print("")
+# 			# ~ print("--------------------")
+# 			# ~ print("Debug Section")
+# 			# ~ print("--------------------")
+# 			# ~ print("Data at address: ")
+# 			# ~ i = MB.reading_offset
+# 			# ~ for x in data:
+# 				# ~ print(f"Data in Address {i}: {x}")
+# 				# ~ i += 1
+# 			# ~ print("------------------------------------------")
 
 
-			print("")
-			print("Press Ctrl+C to Change Settings Or Exit")
+# 			print("")
+# 			print("Press Ctrl+C to Change Settings Or Exit")
 			
 			
 			## Refresh the command line table
 			sleep(0.07)
 			os.system('cls' if os.name == 'nt' else 'clear')
 			
-		## Break the loop and go back to selection menu with a keyboard interupt
+		# Break the loop and go back to selection menu with a keyboard interupt
 		except KeyboardInterrupt:
 			break
 
