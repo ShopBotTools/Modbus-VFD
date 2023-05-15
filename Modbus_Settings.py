@@ -12,16 +12,18 @@ timeout = 0.5							# Timeout time in seconds
 clear_buffers_before_call = True		# Good practice clean up
 clear_buffers_after_call  = True		# Good practice clean up
 
-##
-password = 27
+## P194
+password = 10
 
-## Write Settings
-frequency_reg = 24
-unlock_reg = 48
+## Registers
+read_frequency = 24
+set_frequency = 44
+unlock_drive = 48
+unlock_parameters = 49
 
 # Define Modbus function codes
+READ_REGISTER = 3
 WRITE_SINGLE_REGISTER = 6
 
 ## Read Settings
-#reading_offset = 40009					# Offset for reading the state of the VFD
-read_length = 6							# Number of adresses to read when Polling the VFD for data
+read_length = 6			                # Number of adresses to read when Polling the VFD for data

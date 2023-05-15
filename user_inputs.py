@@ -23,7 +23,7 @@ def get_user_speed():
 	print("------------------------------------------")
 	print("Input Drive Speed")
 	print("----------------")	
-	print("Hirz between 0 - 60")
+	print("Hirz between 60 - 120")
 	print("------------------------------------------")	
 	print("")
 	print("Press Ctrl + C to Exit")
@@ -31,26 +31,22 @@ def get_user_speed():
 	speed_input= input()
 	try:
 		speed_int = int(float(speed_input)*100)
-	except:		
+	except:
 		return "NaN"
 	else:
 		if isinstance(speed_int, int):
-			
-			if speed_int >=0 and speed_int <=6000:
+			if speed_int >=600 and speed_int <=12000:
 				return speed_int
-			else:				
+			else:
 				return "OL"
 		else:
 			return "NaN"
 
 
 
-## Create function for sending the input data to the VFD by casting the speed and drive mode 
-## to a list called "send_list" and passing this list and the write start address to the turny_boi call
-## Once set the port is closed
-def send_to_vfd(reg, param1, op):
-	send_list = [param1, op]
-	turny_boi.write_registers(reg, send_list)
+## Send the request to the vfd
+def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
+	turny_boi.write_register(register, data, decimals, function_code, signed)
 	turny_boi.serial.close()
 
 

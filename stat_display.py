@@ -9,23 +9,23 @@ def read_VFD():
 	import os
 
 	## Create reading "instrument" called "readie_boi" and import it's settings from the modbus settings module
-	readie_boi = minimalmodbus.Instrument(MB.USB_port,MB.mb_address )	
-	readie_boi.mode = minimalmodbus.MODE_RTU							
-	readie_boi.serial.parity = minimalmodbus.serial.PARITY_NONE			
-	readie_boi.serial.baudrate = MB.baudrate							
-	readie_boi.serial.bytesize = MB.bytesize							
-	readie_boi.serial.stopbits = MB.stopbits 							
-	readie_boi.serial.timeout  = MB.timeout								
-	readie_boi.clear_buffers_before_call = MB.clear_buffers_before_call
-	readie_boi.clear_buffers_after_call  = MB.clear_buffers_after_call
+	readie_boi = minimalmodbus.Instrument(MB.USB_port,MB.mb_address )
+	readie_boi.mode = minimalmodbus.MODE_RTU
+	readie_boi.serial.parity = minimalmodbus.serial.PARITY_NONE
+	readie_boi.serial.baudrate = MB.baudrate
+	readie_boi.serial.bytesize = MB.bytesize
+	readie_boi.serial.stopbits = MB.stopbits
+	readie_boi.serial.timeout  = MB.timeout
+	readie_boi.clear_buffers_before_each_transaction = MB.clear_buffers_before_call
+	readie_boi.close_port_after_each_call  = MB.clear_buffers_after_call
 
 
 	## Set a while loop with a try / except statement so it can be broken with a keyboard interupt
 	while True:
 		
-			## Poll the VFD and set the returned data as a list called "data"  
+			## Poll the VFD and set the returned data as a list called "data"
 		try:
-			data =readie_boi.read_registers(MB.frequency_reg, MB.read_length, 3) 
+			data =readie_boi.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
 			readie_boi.serial.close()
 			
 			## Split out the list into individual variables
@@ -37,7 +37,6 @@ def read_VFD():
 			process = data[5]
 
 # 			## Print out all the data
-			
 			print("")
 			print("------------------------------------------")
 			print("VFD Viewer")
@@ -52,29 +51,28 @@ def read_VFD():
 			print("---------------------------------------------------------------")
 			print("---------------------------------------------------------------")
 			print("")
-			
-			
+
 # 			## Debug section, Uncomment for more details on what is in each register address
-			# print("")
-			# print("--------------------")
-			# print("Debug Section")
-			# print("--------------------")
-			# print("Data at address: ")
-			# i = MB.first_reg
-			# for x in data:
-			# 	print(f"Data in Address {i}: {x}")
-			# 	i += 1
-			# print("------------------------------------------")
+			print("")
+			print("--------------------")
+			print("Debug Section")
+			print("--------------------")
+			print("Data at address: ")
+			i = 0
+			for x in data:
+				print(f"Data in Address {i}: {x}")
+				i += 1
+			print("------------------------------------------")
 
 
 			# print("")
 			# print("Press Ctrl+C to Change Settings Or Exit")
-			
-			
+
+
 			## Refresh the command line table
 			sleep(5)
 			os.system('cls' if os.name == 'nt' else 'clear')
-			
+
 		# Break the loop and go back to selection menu with a keyboard interupt
 		except KeyboardInterrupt:
 			break
