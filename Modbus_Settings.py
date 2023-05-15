@@ -16,8 +16,9 @@ clear_buffers_after_call  = True		# Good practice clean up
 password = 27
 
 ## Write Settings
-unlock_reg = 48
+first_reg = 1
 frequency_reg = 24
+unlock_reg = 48
 
 # Define Modbus function codes
 WRITE_SINGLE_REGISTER = 6
