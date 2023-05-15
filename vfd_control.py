@@ -9,10 +9,8 @@ import sys
 
 
 ## Set some flags we use to step through the data input and parsing
-#drive_set = False
 unlocked = False
 speed_set = False
-# drive_package = 0
 speed_package = 0
 
 
@@ -23,6 +21,5 @@ while True:
 	# if speed_set:
 	os.system('cls' if os.name == 'nt' else 'clear')
 	stat.read_VFD()
-	# drive_set = False
 	speed_set = False
 	os.system('cls' if os.name == 'nt' else 'clear')

@@ -16,7 +16,6 @@ clear_buffers_after_call  = True		# Good practice clean up
 password = 27
 
 ## Write Settings
-first_reg = 1
 frequency_reg = 24
 unlock_reg = 48
 

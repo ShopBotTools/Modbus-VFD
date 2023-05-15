@@ -55,20 +55,20 @@ def read_VFD():
 			
 			
 # 			## Debug section, Uncomment for more details on what is in each register address
-			print("")
-			print("--------------------")
-			print("Debug Section")
-			print("--------------------")
-			print("Data at address: ")
-			i = MB.frequency_reg
-			for x in data:
-				print(f"Data in Address {i}: {x}")
-				i += 1
-			print("------------------------------------------")
+			# print("")
+			# print("--------------------")
+			# print("Debug Section")
+			# print("--------------------")
+			# print("Data at address: ")
+			# i = MB.first_reg
+			# for x in data:
+			# 	print(f"Data in Address {i}: {x}")
+			# 	i += 1
+			# print("------------------------------------------")
 
 
-			print("")
-			print("Press Ctrl+C to Change Settings Or Exit")
+			# print("")
+			# print("Press Ctrl+C to Change Settings Or Exit")
 			
 			
 			## Refresh the command line table
