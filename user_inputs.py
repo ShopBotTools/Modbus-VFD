@@ -31,12 +31,12 @@ def get_user_speed():
 
 	speed_input= input()
 	try:
-		speed_int = int(float(speed_input)*100)
+		speed_int = int(float(speed_input)*10)
 	except:
 		return "NaN"
 	else:
 		if isinstance(speed_int, int):
-			if speed_int >=600 and speed_int <=12000:
+			if speed_int >=600 and speed_int <=1200:
 				return speed_int
 			else:
 				return "OL"
