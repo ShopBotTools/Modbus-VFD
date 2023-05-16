@@ -1,11 +1,8 @@
 ## Import the related modules / libraries
-import minimalmodbus
 import user_inputs
 import Modbus_Settings as MB
 import stat_display as stat
-from time import sleep 
 import os
-import sys
 
 
 ## Set some flags we use to step through the data input and parsing
