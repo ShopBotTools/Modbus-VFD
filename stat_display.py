@@ -8,16 +8,17 @@ def read_VFD():
 	from time import sleep
 	import os
 
-	## Create reading "instrument" called "readie_boi" and import it's settings from the modbus settings module
-	readie_boi = minimalmodbus.Instrument(MB.USB_port,MB.mb_address )
-	readie_boi.mode = minimalmodbus.MODE_RTU
-	readie_boi.serial.parity = minimalmodbus.serial.PARITY_NONE
-	readie_boi.serial.baudrate = MB.baudrate
-	readie_boi.serial.bytesize = MB.bytesize
-	readie_boi.serial.stopbits = MB.stopbits
-	readie_boi.serial.timeout  = MB.timeout
-	readie_boi.clear_buffers_before_each_transaction = MB.clear_buffers_before_call
-	readie_boi.close_port_after_each_call  = MB.clear_buffers_after_call
+	## Create reading "instrument" called "reader" and import it's settings from the modbus settings module
+	reader = minimalmodbus.Instrument(MB.USB_port,MB.mb_address )
+	reader.mode = minimalmodbus.MODE_RTU
+	reader.serial.parity = minimalmodbus.serial.PARITY_NONE
+	reader.serial.baudrate = MB.baudrate
+	reader.serial.bytesize = MB.bytesize
+	reader.serial.stopbits = MB.stopbits
+	reader.serial.timeout  = MB.timeout
+	reader.clear_buffers_before_each_transaction = MB.clear_buffers_before_call
+	reader.close_port_after_each_call  = MB.clear_buffers_after_call
+	reader.debug = MB.debug
 
 
 	## Set a while loop with a try / except statement so it can be broken with a keyboard interupt
@@ -25,8 +26,8 @@ def read_VFD():
 		
 			## Poll the VFD and set the returned data as a list called "data"
 		try:
-			data =readie_boi.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
-			readie_boi.serial.close()
+			data =reader.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
+			reader.serial.close()
 			
 			## Split out the list into individual variables
 			current = data[0]

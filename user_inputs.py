@@ -2,17 +2,18 @@
 import minimalmodbus
 import Modbus_Settings as MB
 
-	## Create reading "instrument" called "turnie_boi" and import it's settings from the modbus settings module
+## Create reading "instrument" that can perform write operations and import it's settings from the modbus settings module
 
-turny_boi = minimalmodbus.Instrument(MB.USB_port, MB.mb_address)
-turny_boi.mode = minimalmodbus.MODE_RTU
-turny_boi.serial.parity = minimalmodbus.serial.PARITY_NONE
-turny_boi.serial.baudrate = MB.baudrate
-turny_boi.serial.bytesize = MB.bytesize
-turny_boi.serial.stopbits = MB.stopbits
-turny_boi.serial.timeout  = MB.timeout
-turny_boi.clear_buffers_before_each_transaction = MB.clear_buffers_before_call
-turny_boi.close_port_after_each_call = MB.clear_buffers_after_call 
+writer = minimalmodbus.Instrument(MB.USB_port, MB.mb_address)
+writer.mode = minimalmodbus.MODE_RTU
+writer.serial.parity = minimalmodbus.serial.PARITY_NONE
+writer.serial.baudrate = MB.baudrate
+writer.serial.bytesize = MB.bytesize
+writer.serial.stopbits = MB.stopbits
+writer.serial.timeout  = MB.timeout
+writer.clear_buffers_before_each_transaction = MB.clear_buffers_before_call
+writer.close_port_after_each_call = MB.clear_buffers_after_call
+writer.debug = MB.debug
 
 ## Create function for prompting the user to input the desired RPM and returns the value to be given to the VFD frequency address
 ## Returns the string "NaN" if the user input is not a number
@@ -46,8 +47,8 @@ def get_user_speed():
 
 ## Send the request to the vfd
 def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
-	turny_boi.write_register(register, data, decimals, function_code, signed)
-	turny_boi.serial.close()
+	writer.write_register(register, data, decimals, function_code, signed)
+	writer.serial.close()
 
 
 
