@@ -1,2 +1,3 @@
 minimalmodbus
 argparse
+pyinstaller
