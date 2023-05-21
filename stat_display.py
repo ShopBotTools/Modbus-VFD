@@ -54,18 +54,6 @@ def read_VFD():
             print("")
             print("Press Ctrl+C to Change Settings Or Exit")
 
-# 			## Debug section, Uncomment for more details on what is in each register address
-            # print("")
-            # print("--------------------")
-            # print("Debug Section")
-            # print("--------------------")
-            # i = MB.read_frequency
-            # for x in data:
-            # 	print(f"Data in Address {i}: {x}")
-            # 	i += 1
-            # print("------------------------------------------")
-
-            ## Refresh the command line table
             sleep(2)
             os.system('cls' if os.name == 'nt' else 'clear')
 
