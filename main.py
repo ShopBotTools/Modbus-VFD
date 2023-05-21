@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import font
 import minimalmodbus
-import Modbus_Settings as MB
 import threading
 import argparse
 import user_inputs
