@@ -2,7 +2,7 @@
 import minimalmodbus
 import Modbus_Settings as MB
 
-## Create reading "instrument" that can perform write operations and import it's settings from the modbus settings module
+## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
 
 writer = minimalmodbus.Instrument(MB.USB_port, MB.mb_address)
 writer.mode = minimalmodbus.MODE_RTU
