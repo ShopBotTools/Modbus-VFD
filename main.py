@@ -6,17 +6,49 @@ import threading
 import argparse
 import user_inputs
 
-# Create a lock for synchronization
-lock = threading.Lock()
+########################### Modbus settings ###########################
+## Set the Modbus paramaters in here for both reading and writing to the VFD
+## General Modbus Settings
+
+mb_address = 3                          # Station Address
+USB_port = "COM3"                       # Location of USB to RS485 converter
+baudrate = 9600                         # BaudRate
+bytesize = 8                            # Number of data bits to be requested
+stopbits = 1                            # Number of stop bits
+timeout = 0.5                           # Timeout time in seconds
+clear_buffers_before_call = True        # Good practice clean up
+clear_buffers_after_call  = True        # Good practice clean up
+debug = True
+
+## P194
+password = 0
+
+## Registers
+read_frequency    = 24
+set_frequency     = 44
+unlock_drive      = 48
+unlock_parameters = 49
+
+# Define Modbus function codes
+READ_REGISTER         = 3
+WRITE_SINGLE_REGISTER = 6
+
+## Read Settings
+read_length = 6                # Number of adresses to read when Polling the VFD for data
+#////////////////////////// Modbus Settings //////////////////////////#
+
 
 
 ########################### Command Line Arguments ###########################
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--speed", type=int,  help = "Change the spindle speed, 60-120 currently")
 args = parser.parse_args()
-########################### Command Line Arguments ###########################
+#////////////////////////// Command Line Arguments //////////////////////////#
 
 
+
+# Create a lock for reading and writing synchronization
+lock = threading.Lock()
 
 ############################### Writing the VFD ##############################
 def write_VFD():
@@ -52,7 +84,7 @@ def write_VFD():
         send_to_vfd(MB.unlock_parameters, MB.password, MB.WRITE_SINGLE_REGISTER)
         print("Attempting set frequency")
         send_to_vfd(MB.set_frequency, speed_package, MB.WRITE_SINGLE_REGISTER)
-############################### Writing the VFD ##############################
+#////////////////////////////// Writing the VFD /////////////////////////////#
 
 
 ############################### Reading the VFD ##############################
@@ -94,6 +126,7 @@ def read_VFD(label_vars):
 
             except minimalmodbus.ModbusException:
                 # Handle modbus communication error
+                print("Something went wrong while reading")
                 pass
 
             finally:
@@ -101,7 +134,7 @@ def read_VFD(label_vars):
 
         # Schedule the next update
         root.after(2000, update_gui)  # Adjust the delay as needed (2000 milliseconds = 2 seconds)
-############################### Reading the VFD ##############################
+#//////////////////////////// Reading the VFD ///////////////////////////////#
 
 
 
@@ -176,7 +209,7 @@ def read_VFD(label_vars):
     # Start the initial update
     update_id = root.after(0, update_gui)
     root.mainloop()
-################################### GUI ######################################
+#////////////////////////////////// GUI //////////////////////////////////#
 
 
 # If a command line argument was specified, do that, otherwise read the VFD
