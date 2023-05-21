@@ -1,12 +1,10 @@
 import tkinter as tk
 from tkinter import font
-import minimalmodbus 
+import minimalmodbus
 import Modbus_Settings as MB
-import threading
-from time import sleep
 
 def read_VFD(label_vars):
-    ## Create reading "instrument" called "reader" and import its settings from the modbus settings module
+    # Create reading "instrument" called "reader" and import its settings from the Modbus settings module
     reader = minimalmodbus.Instrument(MB.USB_port, MB.mb_address)
     reader.mode = minimalmodbus.MODE_RTU
     reader.serial.parity = minimalmodbus.serial.PARITY_NONE
@@ -19,48 +17,36 @@ def read_VFD(label_vars):
     reader.debug = MB.debug
 
     def update_gui():
-        while not exit_event.is_set():
-            try:
-                # Read data from the device
-                data = reader.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
-                reader.serial.close()
+        try:
+            # Read data from the device
+            data = reader.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
+            reader.serial.close()
 
-                # Split out the list into individual variables
-                current = data[0]
-                hirz = data[1]
-                volt = data[2]
-                bus = data[3]
-                power = data[4]
-                process = data[5]
+            # Split out the list into individual variables
+            current = data[0]
+            hirz = data[1]
+            volt = data[2]
+            bus = data[3]
+            power = data[4]
+            process = data[5]
 
-                # Update the label variables with the new values
-                label_vars["current"].set(f"{current/10}A")
-                label_vars["hirz"].set(f"{float(hirz/100)}Hz")
-                label_vars["volt"].set(f"{volt}V")
-                label_vars["bus"].set(f"{bus}V")
-                label_vars["power"].set(f"{power/10}kW")
-                label_vars["process"].set(str(process))
+            # Update the label variables with the new values
+            label_vars["current"].set(f"{current / 10}A")
+            label_vars["hirz"].set(f"{float(hirz / 100)}Hz")
+            label_vars["volt"].set(f"{volt}V")
+            label_vars["bus"].set(f"{bus}V")
+            label_vars["power"].set(f"{power / 10}kW")
+            label_vars["process"].set(str(process))
 
-            except minimalmodbus.ModbusException:
-                # Handle modbus communication error
-                pass
+        except minimalmodbus.ModbusException:
+            # Handle modbus communication error
+            pass
 
-            # Delay between updates
-            sleep(1)  # Adjust the delay as needed
-
-    def stop_update():
-        # Set the exit event to stop the update thread
-        exit_event.set()
-
-    # Create an exit event to signal the update thread to stop
-    exit_event = threading.Event()
-
-    # Start the update thread
-    update_thread = threading.Thread(target=update_gui)
-    update_thread.start()
+        # Schedule the next update
+        root.after(2000, update_gui)  # Adjust the delay as needed (2000 milliseconds = 2 seconds)
 
     ################################GUI##################################
-    root = tk.Tk()  # create a root widget
+    root = tk.Tk()  # Create a root widget
 
     FONT_SIZE = font.Font(size=15)
     WINDOW_BACKGROUND = "white"
@@ -122,14 +108,18 @@ def read_VFD(label_vars):
     operation_code_value.grid(row=6, column=2, padx=X_PADDING)
 
     # Stop button
+    def stop_update():
+        root.after_cancel(update_id)
+
     stop_button = tk.Button(root, text="Stop Update", command=stop_update)
     stop_button.grid(row=7, column=1, columnspan=2, pady=10)
 
     root.iconbitmap("rpm.ico")
-    root.mainloop()
 
-    # Wait for the update thread to complete
-    update_thread.join()
+    # Start the initial update
+    update_id = root.after(0, update_gui)
+
+    root.mainloop()
 
 # Call the read_VFD() function to update the GUI
 read_VFD({})
