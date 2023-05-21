@@ -1,6 +1,9 @@
 ## Import the related modules / libraries
 import minimalmodbus
 import Modbus_Settings as MB
+import threading
+
+lock = threading.Lock()
 
 ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
 
@@ -57,16 +60,8 @@ def set_user_speed(speed):
         else:
             return "NaN"
 
-
 ## Send the request to the vfd
 def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
-    writer.write_register(register, data, decimals, function_code, signed)
-    writer.serial.close()
-
-
-
-
-
-
-
-
+    with lock:
+        writer.write_register(register, data, decimals, function_code, signed)
+        writer.serial.close()

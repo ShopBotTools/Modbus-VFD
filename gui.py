@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import font
 import minimalmodbus
 import Modbus_Settings as MB
+import threading
+
+# Create a lock for synchronization
+lock = threading.Lock()
 
 def read_VFD(label_vars):
     # Create reading "instrument" called "reader" and import its settings from the Modbus settings module
@@ -17,30 +21,34 @@ def read_VFD(label_vars):
     reader.debug = MB.debug
 
     def update_gui():
-        try:
-            # Read data from the device
-            data = reader.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
-            reader.serial.close()
+        with lock:
+            try:
+                # Read data from the device
+                data = reader.read_registers(MB.read_frequency, MB.read_length, MB.READ_REGISTER)
+                reader.serial.close()
 
-            # Split out the list into individual variables
-            current = data[0]
-            hirz = data[1]
-            volt = data[2]
-            bus = data[3]
-            power = data[4]
-            process = data[5]
+                # Split out the list into individual variables
+                current = data[0]
+                hirz = data[1]
+                volt = data[2]
+                bus = data[3]
+                power = data[4]
+                process = data[5]
 
-            # Update the label variables with the new values
-            label_vars["current"].set(f"{current / 10}A")
-            label_vars["hirz"].set(f"{float(hirz / 100)}Hz")
-            label_vars["volt"].set(f"{volt}V")
-            label_vars["bus"].set(f"{bus}V")
-            label_vars["power"].set(f"{power / 10}kW")
-            label_vars["process"].set(str(process))
+                # Update the label variables with the new values
+                label_vars["current"].set(f"{current / 10}A")
+                label_vars["hirz"].set(f"{float(hirz / 100)}Hz")
+                label_vars["volt"].set(f"{volt}V")
+                label_vars["bus"].set(f"{bus}V")
+                label_vars["power"].set(f"{power / 10}kW")
+                label_vars["process"].set(str(process))
 
-        except minimalmodbus.ModbusException:
-            # Handle modbus communication error
-            pass
+            except minimalmodbus.ModbusException:
+                # Handle modbus communication error
+                pass
+
+            finally:
+                reader.serial.close()
 
         # Schedule the next update
         root.after(2000, update_gui)  # Adjust the delay as needed (2000 milliseconds = 2 seconds)
@@ -110,9 +118,6 @@ def read_VFD(label_vars):
     # Stop button
     def stop_update():
         root.after_cancel(update_id)
-
-    stop_button = tk.Button(root, text="Stop Update", command=stop_update)
-    stop_button.grid(row=7, column=1, columnspan=2, pady=10)
 
     root.iconbitmap("rpm.ico")
 
