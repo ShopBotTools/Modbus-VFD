@@ -65,7 +65,7 @@ def read_VFD(label_vars):
     root.config(background=WINDOW_BACKGROUND)
     root.minsize(100, 100)  # width, height
     root.maxsize(1000, 1000)
-    root.geometry("700x150+50+50")  # width x height + x + y
+    root.geometry("700x200+50+50")  # width x height + x + y
 
     # Create label variables using StringVar
     label_vars = {
