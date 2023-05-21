@@ -3,7 +3,6 @@ from tkinter import font
 import minimalmodbus
 import threading
 import argparse
-import user_inputs
 
 ########################### Modbus settings ###########################
 ## Set the Modbus paramaters in here for both reading and writing to the VFD
@@ -37,6 +36,49 @@ READ_LENGTH = 6                # Number of adresses to read when Polling the VFD
 #////////////////////////// Modbus Settings //////////////////////////#
 
 
+########################### User Inputs ###############################
+## Create function for prompting the user to input the desired RPM and returns the value to be given to the VFD frequency address
+## Returns the string "NaN" if the user input is not a number
+## Returns the string "OL" if the user input is outside the limits of 0-60Hz
+def get_user_speed():
+    print("")
+    print("")
+    print("------------------------------------------")
+    print("Input Drive Speed")
+    print("----------------")	
+    print("Hirz between 60 - 120")
+    print("------------------------------------------")	
+    print("")
+    print("Press Ctrl + C to Exit")
+
+    speed_input= input()
+    try:
+        speed_int = int(float(speed_input)*10)
+    except:
+        return "NaN"
+    else:
+        if isinstance(speed_int, int):
+            if speed_int >=600 and speed_int <=1200:
+                return speed_int
+            else:
+                return "OL"
+        else:
+            return "NaN"
+
+def set_user_speed(speed):
+    try:
+        speed_int = int(float(speed)*10)
+    except:
+        return "NaN"
+    else:
+        if isinstance(speed_int, int):
+            if speed_int >=600 and speed_int <=1200:
+                return speed_int
+            else:
+                return "OL"
+        else:
+            return "NaN"
+#//////////////////////////////// User Inputs ///////////////////////////////#
 
 ########################### Command Line Arguments ###########################
 parser = argparse.ArgumentParser()
@@ -64,7 +106,7 @@ def write_VFD():
     writer.debug = DEBUG
 
     speed_set = False
-    speed_package = user_inputs.set_user_speed(args.speed)
+    speed_package = set_user_speed(args.speed)
     if speed_package != "NaN" and speed_package != "OL":
         speed_set = True
     
