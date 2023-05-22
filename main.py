@@ -249,10 +249,6 @@ def read_VFD(label_vars):
     operation_code_value = tk.Label(root, textvariable=label_vars["process"], bg=FONT_BACKGROUND, font=FONT_SIZE)
     operation_code_value.grid(row=6, column=2, padx=X_PADDING)
 
-    # Stop button
-    def stop_update():
-        root.after_cancel(update_id)
-
     root.iconbitmap("rpm.ico")
 
     # Start the initial update
