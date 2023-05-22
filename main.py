@@ -1,0 +1,275 @@
+import tkinter as tk
+from tkinter import font
+import minimalmodbus
+import threading
+import argparse
+from time import sleep
+
+########################### Modbus settings ###########################
+## Set the Modbus paramaters in here for both reading and writing to the VFD
+## General Modbus Settings
+
+MB_ADDRESS = 3                          # Station Address
+USB_PORT = "COM3"                       # Location of USB to RS485 converter
+BAUDRATE = 9600                         # BAUDRATE
+BYTESIZE = 8                            # Number of data bits to be requested
+STOPBITS = 1                            # Number of stop bits
+TIMEOUT = 0.5                           # TIMEOUT time in seconds
+CLEAR_BUFFERS_BEFORE_CALL = True        # Good practice clean up
+CLEAR_BUFFERS_AFTER_CALL  = True        # Good practice clean up
+DEBUG = False
+
+## P194
+PASSWORD = 0
+
+## Registers
+READ_FREQUENCY    = 24
+SET_FREQUENCY     = 44
+UNLOCK_DRIVE      = 48
+UNLOCK_PARAMETERS = 49
+
+# Define Modbus function codes
+READ_REGISTER         = 3
+WRITE_SINGLE_REGISTER = 6
+
+## Read Settings
+READ_LENGTH = 6                # Number of adresses to read when Polling the VFD for data
+#////////////////////////// Modbus Settings //////////////////////////#
+
+
+########################### User Inputs ###############################
+## Create function for prompting the user to input the desired RPM and returns the value to be given to the VFD frequency address
+## Returns the string "NaN" if the user input is not a number
+## Returns the string "OL" if the user input is outside the limits of 0-60Hz
+def get_user_speed():
+    print("")
+    print("")
+    print("------------------------------------------")
+    print("Input Drive Speed")
+    print("----------------")	
+    print("Hirz between 60 - 120")
+    print("------------------------------------------")	
+    print("")
+    print("Press Ctrl + C to Exit")
+
+    speed_input= input()
+    try:
+        speed_int = int(float(speed_input)*10)
+    except:
+        return "NaN"
+    else:
+        if isinstance(speed_int, int):
+            if speed_int >=600 and speed_int <=1200:
+                return speed_int
+            else:
+                return "OL"
+        else:
+            return "NaN"
+
+def set_user_speed(speed):
+    try:
+        speed_int = int(float(speed)*10)
+    except:
+        return "NaN"
+    else:
+        if isinstance(speed_int, int):
+            if speed_int >=600 and speed_int <=1200:
+                return speed_int
+            else:
+                return "OL"
+        else:
+            return "NaN"
+#//////////////////////////////// User Inputs ///////////////////////////////#
+
+
+
+########################### Command Line Arguments ###########################
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--speed", type=int,  help = "Change the spindle speed, 60-120 currently")
+args = parser.parse_args()
+#////////////////////////// Command Line Arguments //////////////////////////#
+
+
+
+# Create a lock for reading and writing synchronization
+lock = threading.Lock()
+
+############################### Writing the VFD ##############################
+def write_VFD(user_input):
+        ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
+        writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
+        writer.mode = minimalmodbus.MODE_RTU
+        writer.serial.parity = minimalmodbus.serial.PARITY_NONE
+        writer.serial.baudrate = BAUDRATE
+        writer.serial.bytesize = BYTESIZE
+        writer.serial.stopbits = STOPBITS
+        writer.serial.timeout  = TIMEOUT
+        writer.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
+        writer.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
+        writer.debug = DEBUG
+
+        speed_set = False
+        if args.speed:
+            speed_package = set_user_speed(args.speed)
+        else:
+            speed_package = set_user_speed(user_input)
+
+        if speed_package != "NaN" and speed_package != "OL":
+            speed_set = True
+        
+        ## Send the request to the vfd
+        def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
+            with lock:
+                writer.write_register(register, data, decimals, function_code, signed)
+                writer.serial.close()
+
+        # If the speed has been set correctly then pass on the speed package as
+        # well as the register position to the function to send to the VFD
+        if speed_set:
+            print("Attempting unlock drive")
+            send_to_vfd(UNLOCK_DRIVE, PASSWORD, WRITE_SINGLE_REGISTER)
+            print("Attempting unlock parameters")
+            send_to_vfd(UNLOCK_PARAMETERS, PASSWORD, WRITE_SINGLE_REGISTER)
+            print("Attempting set frequency")
+            send_to_vfd(SET_FREQUENCY, speed_package, WRITE_SINGLE_REGISTER)
+#////////////////////////////// Writing the VFD /////////////////////////////#
+
+
+############################### Reading the VFD ##############################
+def read_VFD(label_vars):
+    # Create reading "instrument" called "reader" and import its settings from the Modbus settings module
+    reader = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
+    reader.mode = minimalmodbus.MODE_RTU
+    reader.serial.parity = minimalmodbus.serial.PARITY_NONE
+    reader.serial.baudrate = BAUDRATE
+    reader.serial.bytesize = BYTESIZE
+    reader.serial.stopbits = STOPBITS
+    reader.serial.timeout = TIMEOUT
+    reader.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
+    reader.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
+    reader.debug = DEBUG
+
+    def update_gui():
+        with lock:
+            try:
+                # Read data from the device
+                data = reader.read_registers(READ_FREQUENCY, READ_LENGTH, READ_REGISTER)
+                reader.serial.close()
+
+                # Split out the list into individual variables
+                current = data[0]
+                hirz = data[1]
+                volt = data[2]
+                bus = data[3]
+                power = data[4]
+                process = data[5]
+
+                # Update the label variables with the new values
+                label_vars["current"].set(f"{current / 10}A")
+                label_vars["hirz"].set(f"{float(hirz / 100)}Hz")
+                label_vars["volt"].set(f"{volt}V")
+                label_vars["bus"].set(f"{bus}V")
+                label_vars["power"].set(f"{power / 10}kW")
+                label_vars["process"].set(str(process))
+
+            except minimalmodbus.ModbusException as e:
+                # Handle modbus communication error
+                print("Modbus Exception:", e)
+                # Update GUI or show an error message to the user
+                label_vars["process"].set("Error: Modbus Exception")
+            except Exception as e:
+                # Handle other exceptions
+                print("Exception:", e)
+                # Update GUI or show an error message to the user
+                label_vars["process"].set("Error: Unknown Exception")
+
+            finally:
+                reader.serial.close()
+
+        # Schedule the next update
+        root.after(2000, update_gui)  # Adjust the delay as needed (2000 milliseconds = 2 seconds)
+#//////////////////////////// Reading the VFD ///////////////////////////////#
+################################### GUI ######################################
+    root = tk.Tk()  # Create a root widget
+
+    FONT_SIZE = font.Font(size=15)
+    WINDOW_BACKGROUND = "white"
+    FONT_BACKGROUND = "white"
+    X_PADDING = 10
+
+    root.title("Spindle Control")
+    root.config(background=WINDOW_BACKGROUND)
+    root.minsize(100, 100)  # width, height
+    root.maxsize(1000, 1000)
+    root.geometry("700x200+50+50")  # width x height + x + y
+
+    # Create label variables using StringVar
+    label_vars = {
+        "current": tk.StringVar(),
+        "hirz": tk.StringVar(),
+        "volt": tk.StringVar(),
+        "bus": tk.StringVar(),
+        "power": tk.StringVar(),
+        "process": tk.StringVar()
+    }
+
+    # Column 1, Keys
+    current_label = tk.Label(root, text="Current", bg=FONT_BACKGROUND, font=FONT_SIZE)
+    current_label.grid(row=1, column=1, padx=X_PADDING)
+
+    frequency_label = tk.Label(root, text="Frequency", bg=FONT_BACKGROUND, font=FONT_SIZE)
+    frequency_label.grid(row=2, column=1, padx=X_PADDING)
+
+    output_voltage_label = tk.Label(root, text="Output Voltage", bg=FONT_BACKGROUND, font=FONT_SIZE)
+    output_voltage_label.grid(row=3, column=1, padx=X_PADDING)
+
+    dc_voltage_label = tk.Label(root, text="DC Bus Voltage", bg=FONT_BACKGROUND, font=FONT_SIZE)
+    dc_voltage_label.grid(row=4, column=1, padx=X_PADDING)
+
+    total_power_label = tk.Label(root, text="Total Power", bg=FONT_BACKGROUND, font=FONT_SIZE)
+    total_power_label.grid(row=5, column=1, padx=X_PADDING)
+
+    operation_code_label = tk.Label(root, text="Operation Code", bg=FONT_BACKGROUND, font=FONT_SIZE)
+    operation_code_label.grid(row=6, column=1, padx=X_PADDING)
+
+    # Column 2, Values
+    current_value = tk.Label(root, textvariable=label_vars["current"], bg=FONT_BACKGROUND, font=FONT_SIZE)
+    current_value.grid(row=1, column=2, padx=X_PADDING)
+
+    frequency_value = tk.Label(root, textvariable=label_vars["hirz"], bg=FONT_BACKGROUND, font=FONT_SIZE)
+    frequency_value.grid(row=2, column=2, padx=X_PADDING)
+
+    output_voltage_value = tk.Label(root, textvariable=label_vars["volt"], bg=FONT_BACKGROUND, font=FONT_SIZE)
+    output_voltage_value.grid(row=3, column=2, padx=X_PADDING)
+
+    dc_voltage_value = tk.Label(root, textvariable=label_vars["bus"], bg=FONT_BACKGROUND, font=FONT_SIZE)
+    dc_voltage_value.grid(row=4, column=2, padx=X_PADDING)
+
+    total_power_value = tk.Label(root, textvariable=label_vars["power"], bg=FONT_BACKGROUND, font=FONT_SIZE)
+    total_power_value.grid(row=5, column=2, padx=X_PADDING)
+
+    operation_code_value = tk.Label(root, textvariable=label_vars["process"], bg=FONT_BACKGROUND, font=FONT_SIZE)
+    operation_code_value.grid(row=6, column=2, padx=X_PADDING)
+
+    # Create an entry widget for manual input of current value
+    current_entry = tk.Entry(root, bg=FONT_BACKGROUND, font=FONT_SIZE)
+    current_entry.grid(row=1, column=3, padx=X_PADDING)
+
+    # Button to set the current value
+    set_current_button = tk.Button(root, text="Set Current", command=lambda: write_VFD(current_entry.get()))
+    set_current_button.grid(row=1, column=4, padx=X_PADDING)
+
+    root.iconbitmap("rpm.ico")
+
+    # Start the initial update
+    root.after(0, update_gui)
+    root.mainloop()
+#////////////////////////////////// GUI //////////////////////////////////#
+
+
+# If a command line argument was specified, do that, otherwise read the VFD
+if args.speed:
+        write_VFD()
+else:
+    sleep(3)
+    read_VFD({})
