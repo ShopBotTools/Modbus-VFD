@@ -95,7 +95,7 @@ args = parser.parse_args()
 lock = threading.Lock()
 
 ############################### Writing the VFD ##############################
-def write_VFD():
+def write_VFD(user_input):
         ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
         writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
         writer.mode = minimalmodbus.MODE_RTU
@@ -109,7 +109,11 @@ def write_VFD():
         writer.debug = DEBUG
 
         speed_set = False
-        speed_package = set_user_speed(args.speed)
+        if args.speed:
+            speed_package = set_user_speed(args.speed)
+        else:
+            speed_package = set_user_speed(user_input)
+
         if speed_package != "NaN" and speed_package != "OL":
             speed_set = True
         
@@ -139,7 +143,7 @@ def read_VFD(label_vars):
     reader.serial.parity = minimalmodbus.serial.PARITY_NONE
     reader.serial.baudrate = BAUDRATE
     reader.serial.bytesize = BYTESIZE
-    reader.serial.STOPBITS = STOPBITS
+    reader.serial.stopbits = STOPBITS
     reader.serial.timeout = TIMEOUT
     reader.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
     reader.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
@@ -246,6 +250,14 @@ def read_VFD(label_vars):
 
     operation_code_value = tk.Label(root, textvariable=label_vars["process"], bg=FONT_BACKGROUND, font=FONT_SIZE)
     operation_code_value.grid(row=6, column=2, padx=X_PADDING)
+
+    # Create an entry widget for manual input of current value
+    current_entry = tk.Entry(root, bg=FONT_BACKGROUND, font=FONT_SIZE)
+    current_entry.grid(row=1, column=3, padx=X_PADDING)
+
+    # Button to set the current value
+    set_current_button = tk.Button(root, text="Set Current", command=lambda: write_VFD(current_entry.get()))
+    set_current_button.grid(row=1, column=4, padx=X_PADDING)
 
     root.iconbitmap("rpm.ico")
 
