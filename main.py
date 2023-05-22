@@ -3,6 +3,7 @@ from tkinter import font
 import minimalmodbus
 import threading
 import argparse
+from time import sleep
 
 ########################### Modbus settings ###########################
 ## Set the Modbus paramaters in here for both reading and writing to the VFD
@@ -16,7 +17,7 @@ STOPBITS = 1                            # Number of stop bits
 TIMEOUT = 0.5                           # TIMEOUT time in seconds
 CLEAR_BUFFERS_BEFORE_CALL = True        # Good practice clean up
 CLEAR_BUFFERS_AFTER_CALL  = True        # Good practice clean up
-DEBUG = True
+DEBUG = False
 
 ## P194
 PASSWORD = 0
@@ -184,9 +185,6 @@ def read_VFD(label_vars):
         # Schedule the next update
         root.after(2000, update_gui)  # Adjust the delay as needed (2000 milliseconds = 2 seconds)
 #//////////////////////////// Reading the VFD ///////////////////////////////#
-
-
-
 ################################### GUI ######################################
     root = tk.Tk()  # Create a root widget
 
@@ -252,7 +250,7 @@ def read_VFD(label_vars):
     root.iconbitmap("rpm.ico")
 
     # Start the initial update
-    update_id = root.after(0, update_gui)
+    root.after(0, update_gui)
     root.mainloop()
 #////////////////////////////////// GUI //////////////////////////////////#
 
@@ -261,4 +259,5 @@ def read_VFD(label_vars):
 if args.speed:
         write_VFD()
 else:
+    sleep(3)
     read_VFD({})
