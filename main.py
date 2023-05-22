@@ -41,31 +41,6 @@ READ_LENGTH = 6                # Number of adresses to read when Polling the VFD
 ## Create function for prompting the user to input the desired RPM and returns the value to be given to the VFD frequency address
 ## Returns the string "NaN" if the user input is not a number
 ## Returns the string "OL" if the user input is outside the limits of 0-60Hz
-def get_user_speed():
-    print("")
-    print("")
-    print("------------------------------------------")
-    print("Input Drive Speed")
-    print("----------------")	
-    print("Hirz between 60 - 120")
-    print("------------------------------------------")	
-    print("")
-    print("Press Ctrl + C to Exit")
-
-    speed_input= input()
-    try:
-        speed_int = int(float(speed_input)*10)
-    except:
-        return "NaN"
-    else:
-        if isinstance(speed_int, int):
-            if speed_int >=600 and speed_int <=1200:
-                return speed_int
-            else:
-                return "OL"
-        else:
-            return "NaN"
-
 def set_user_speed(speed):
     try:
         speed_int = int(float(speed)*10)
@@ -96,42 +71,39 @@ lock = threading.Lock()
 
 ############################### Writing the VFD ##############################
 def write_VFD(user_input):
-        ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
-        writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
-        writer.mode = minimalmodbus.MODE_RTU
-        writer.serial.parity = minimalmodbus.serial.PARITY_NONE
-        writer.serial.baudrate = BAUDRATE
-        writer.serial.bytesize = BYTESIZE
-        writer.serial.stopbits = STOPBITS
-        writer.serial.timeout  = TIMEOUT
-        writer.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
-        writer.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
-        writer.debug = DEBUG
+    ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
+    writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
+    writer.mode = minimalmodbus.MODE_RTU
+    writer.serial.parity = minimalmodbus.serial.PARITY_NONE
+    writer.serial.baudrate = BAUDRATE
+    writer.serial.bytesize = BYTESIZE
+    writer.serial.stopbits = STOPBITS
+    writer.serial.timeout  = TIMEOUT
+    writer.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
+    writer.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
+    writer.debug = DEBUG
 
-        speed_set = False
-        if args.speed:
-            speed_package = set_user_speed(args.speed)
-        else:
-            speed_package = set_user_speed(user_input)
+    speed_set = False
+    speed_package = set_user_speed(user_input)
 
-        if speed_package != "NaN" and speed_package != "OL":
-            speed_set = True
-        
-        ## Send the request to the vfd
-        def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
-            with lock:
-                writer.write_register(register, data, decimals, function_code, signed)
-                writer.serial.close()
+    if speed_package != "NaN" and speed_package != "OL":
+        speed_set = True
 
-        # If the speed has been set correctly then pass on the speed package as
-        # well as the register position to the function to send to the VFD
-        if speed_set:
-            print("Attempting unlock drive")
-            send_to_vfd(UNLOCK_DRIVE, PASSWORD, WRITE_SINGLE_REGISTER)
-            print("Attempting unlock parameters")
-            send_to_vfd(UNLOCK_PARAMETERS, PASSWORD, WRITE_SINGLE_REGISTER)
-            print("Attempting set frequency")
-            send_to_vfd(SET_FREQUENCY, speed_package, WRITE_SINGLE_REGISTER)
+    ## Send the request to the vfd
+    def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
+        with lock:
+            writer.write_register(register, data, decimals, function_code, signed)
+            writer.serial.close()
+
+    # If the speed has been set correctly then pass on the speed package as
+    # well as the register position to the function to send to the VFD
+    if speed_set:
+        print("Attempting unlock drive")
+        send_to_vfd(UNLOCK_DRIVE, PASSWORD, WRITE_SINGLE_REGISTER)
+        print("Attempting unlock parameters")
+        send_to_vfd(UNLOCK_PARAMETERS, PASSWORD, WRITE_SINGLE_REGISTER)
+        print("Attempting set frequency")
+        send_to_vfd(SET_FREQUENCY, speed_package, WRITE_SINGLE_REGISTER)
 #////////////////////////////// Writing the VFD /////////////////////////////#
 
 
@@ -256,7 +228,11 @@ def read_VFD(label_vars):
     current_entry.grid(row=1, column=3, padx=X_PADDING)
 
     # Button to set the current value
-    set_current_button = tk.Button(root, text="Set Current", command=lambda: write_VFD(current_entry.get()))
+    def set_current():
+        value = current_entry.get()
+        if value:
+            write_VFD(value)
+    set_current_button = tk.Button(root, text="Set Current", command=set_current)
     set_current_button.grid(row=1, column=4, padx=X_PADDING)
 
     root.iconbitmap("rpm.ico")
@@ -269,7 +245,7 @@ def read_VFD(label_vars):
 
 # If a command line argument was specified, do that, otherwise read the VFD
 if args.speed:
-        write_VFD()
+        write_VFD(args.speed)
 else:
     sleep(3)
     read_VFD({})
