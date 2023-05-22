@@ -80,6 +80,8 @@ def set_user_speed(speed):
             return "NaN"
 #//////////////////////////////// User Inputs ///////////////////////////////#
 
+
+
 ########################### Command Line Arguments ###########################
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--speed", type=int,  help = "Change the spindle speed, 60-120 currently")
@@ -93,38 +95,38 @@ lock = threading.Lock()
 
 ############################### Writing the VFD ##############################
 def write_VFD():
-    ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
-    writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
-    writer.mode = minimalmodbus.MODE_RTU
-    writer.serial.parity = minimalmodbus.serial.PARITY_NONE
-    writer.serial.baudrate = BAUDRATE
-    writer.serial.bytesize = BYTESIZE
-    writer.serial.stopbits = STOPBITS
-    writer.serial.timeout  = TIMEOUT
-    writer.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
-    writer.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
-    writer.debug = DEBUG
+        ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
+        writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
+        writer.mode = minimalmodbus.MODE_RTU
+        writer.serial.parity = minimalmodbus.serial.PARITY_NONE
+        writer.serial.baudrate = BAUDRATE
+        writer.serial.bytesize = BYTESIZE
+        writer.serial.stopbits = STOPBITS
+        writer.serial.timeout  = TIMEOUT
+        writer.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
+        writer.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
+        writer.debug = DEBUG
 
-    speed_set = False
-    speed_package = set_user_speed(args.speed)
-    if speed_package != "NaN" and speed_package != "OL":
-        speed_set = True
-    
-    ## Send the request to the vfd
-    def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
-        with lock:
-            writer.write_register(register, data, decimals, function_code, signed)
-            writer.serial.close()
+        speed_set = False
+        speed_package = set_user_speed(args.speed)
+        if speed_package != "NaN" and speed_package != "OL":
+            speed_set = True
+        
+        ## Send the request to the vfd
+        def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
+            with lock:
+                writer.write_register(register, data, decimals, function_code, signed)
+                writer.serial.close()
 
-    # If the speed has been set correctly then pass on the speed package as
-    # well as the register position to the function to send to the VFD
-    if speed_set:
-        print("Attempting unlock drive")
-        send_to_vfd(UNLOCK_DRIVE, PASSWORD, WRITE_SINGLE_REGISTER)
-        print("Attempting unlock parameters")
-        send_to_vfd(UNLOCK_PARAMETERS, PASSWORD, WRITE_SINGLE_REGISTER)
-        print("Attempting set frequency")
-        send_to_vfd(SET_FREQUENCY, speed_package, WRITE_SINGLE_REGISTER)
+        # If the speed has been set correctly then pass on the speed package as
+        # well as the register position to the function to send to the VFD
+        if speed_set:
+            print("Attempting unlock drive")
+            send_to_vfd(UNLOCK_DRIVE, PASSWORD, WRITE_SINGLE_REGISTER)
+            print("Attempting unlock parameters")
+            send_to_vfd(UNLOCK_PARAMETERS, PASSWORD, WRITE_SINGLE_REGISTER)
+            print("Attempting set frequency")
+            send_to_vfd(SET_FREQUENCY, speed_package, WRITE_SINGLE_REGISTER)
 #////////////////////////////// Writing the VFD /////////////////////////////#
 
 
@@ -165,10 +167,16 @@ def read_VFD(label_vars):
                 label_vars["power"].set(f"{power / 10}kW")
                 label_vars["process"].set(str(process))
 
-            except minimalmodbus.ModbusException:
+            except minimalmodbus.ModbusException as e:
                 # Handle modbus communication error
-                print("Something went wrong while reading")
-                pass
+                print("Modbus Exception:", e)
+                # Update GUI or show an error message to the user
+                label_vars["process"].set("Error: Modbus Exception")
+            except Exception as e:
+                # Handle other exceptions
+                print("Exception:", e)
+                # Update GUI or show an error message to the user
+                label_vars["process"].set("Error: Unknown Exception")
 
             finally:
                 reader.serial.close()
@@ -255,6 +263,6 @@ def read_VFD(label_vars):
 
 # If a command line argument was specified, do that, otherwise read the VFD
 if args.speed:
-    write_VFD()
+        write_VFD()
 else:
     read_VFD({})
