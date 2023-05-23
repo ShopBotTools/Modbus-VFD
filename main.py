@@ -4,38 +4,7 @@ import minimalmodbus
 import threading
 import argparse
 from time import sleep
-
-########################### Modbus settings ###########################
-## Set the Modbus paramaters in here for both reading and writing to the VFD
-## General Modbus Settings
-
-MB_ADDRESS = 3                          # Station Address
-USB_PORT = "COM3"                       # Location of USB to RS485 converter
-BAUDRATE = 9600                         # BAUDRATE
-BYTESIZE = 8                            # Number of data bits to be requested
-STOPBITS = 1                            # Number of stop bits
-TIMEOUT = 0.5                           # TIMEOUT time in seconds
-CLEAR_BUFFERS_BEFORE_CALL = True        # Good practice clean up
-CLEAR_BUFFERS_AFTER_CALL  = True        # Good practice clean up
-DEBUG = False
-
-## P194
-PASSWORD = 0
-
-## Registers
-READ_FREQUENCY    = 24
-SET_FREQUENCY     = 44
-UNLOCK_DRIVE      = 48
-UNLOCK_PARAMETERS = 49
-
-# Define Modbus function codes
-READ_REGISTER         = 3
-WRITE_SINGLE_REGISTER = 6
-
-## Read Settings
-READ_LENGTH = 6                # Number of adresses to read when Polling the VFD for data
-#////////////////////////// Modbus Settings //////////////////////////#
-
+import modbus_settings as MB
 
 ########################### User Inputs ###############################
 ## Create function for prompting the user to input the desired RPM and returns the value to be given to the VFD frequency address
@@ -72,16 +41,16 @@ lock = threading.Lock()
 ############################### Writing the VFD ##############################
 def write_VFD(user_input):
     ## Create writing "instrument" that can perform write operations and import it's settings from the modbus settings module
-    writer = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
+    writer = minimalmodbus.Instrument(MB.USB_PORT, MB.MB_ADDRESS)
     writer.mode = minimalmodbus.MODE_RTU
     writer.serial.parity = minimalmodbus.serial.PARITY_NONE
-    writer.serial.baudrate = BAUDRATE
-    writer.serial.bytesize = BYTESIZE
-    writer.serial.stopbits = STOPBITS
-    writer.serial.timeout  = TIMEOUT
-    writer.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
-    writer.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
-    writer.debug = DEBUG
+    writer.serial.baudrate = MB.BAUDRATE
+    writer.serial.bytesize = MB.BYTESIZE
+    writer.serial.stopbits = MB.STOPBITS
+    writer.serial.timeout  = MB.TIMEOUT
+    writer.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
+    writer.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
+    writer.debug = MB.DEBUG
 
     speed_set = False
     speed_package = set_user_speed(user_input)
@@ -99,33 +68,33 @@ def write_VFD(user_input):
     # well as the register position to the function to send to the VFD
     if speed_set:
         print("Attempting unlock drive")
-        send_to_vfd(UNLOCK_DRIVE, PASSWORD, WRITE_SINGLE_REGISTER)
+        send_to_vfd(MB.UNLOCK_DRIVE, MB.PASSWORD, MB.WRITE_SINGLE_REGISTER)
         print("Attempting unlock parameters")
-        send_to_vfd(UNLOCK_PARAMETERS, PASSWORD, WRITE_SINGLE_REGISTER)
+        send_to_vfd(MB.UNLOCK_PARAMETERS, MB.PASSWORD, MB.WRITE_SINGLE_REGISTER)
         print("Attempting set frequency")
-        send_to_vfd(SET_FREQUENCY, speed_package, WRITE_SINGLE_REGISTER)
+        send_to_vfd(MB.SET_FREQUENCY, speed_package, MB.WRITE_SINGLE_REGISTER)
 #////////////////////////////// Writing the VFD /////////////////////////////#
 
 
 ############################### Reading the VFD ##############################
 def read_VFD(label_vars):
     # Create reading "instrument" called "reader" and import its settings from the Modbus settings module
-    reader = minimalmodbus.Instrument(USB_PORT, MB_ADDRESS)
+    reader = minimalmodbus.Instrument(MB.USB_PORT, MB.MB_ADDRESS)
     reader.mode = minimalmodbus.MODE_RTU
     reader.serial.parity = minimalmodbus.serial.PARITY_NONE
-    reader.serial.baudrate = BAUDRATE
-    reader.serial.bytesize = BYTESIZE
-    reader.serial.stopbits = STOPBITS
-    reader.serial.timeout = TIMEOUT
-    reader.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
-    reader.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
-    reader.debug = DEBUG
+    reader.serial.baudrate = MB.BAUDRATE
+    reader.serial.bytesize = MB.BYTESIZE
+    reader.serial.stopbits = MB.STOPBITS
+    reader.serial.timeout = MB.TIMEOUT
+    reader.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
+    reader.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
+    reader.debug = MB.DEBUG
 
     def update_gui():
         with lock:
             try:
                 # Read data from the device
-                data = reader.read_registers(READ_FREQUENCY, READ_LENGTH, READ_REGISTER)
+                data = reader.read_registers(MB.READ_FREQUENCY, MB.READ_LENGTH, MB.READ_REGISTER)
                 reader.serial.close()
 
                 # Split out the list into individual variables
@@ -227,11 +196,12 @@ def read_VFD(label_vars):
     current_entry = tk.Entry(root, bg=FONT_BACKGROUND, font=FONT_SIZE)
     current_entry.grid(row=1, column=3, padx=X_PADDING)
 
-    # Button to set the current value
+    # Function to call when set current button is pressed
     def set_current():
         value = current_entry.get()
         if value:
             write_VFD(value)
+    # Button to set the current value
     set_current_button = tk.Button(root, text="Set Current", command=set_current)
     set_current_button.grid(row=1, column=4, padx=X_PADDING)
 
