@@ -2,10 +2,11 @@ from model import VFDModel
 from view import VFDView
 
 class VFDController:
-    def __init__(self):
+    def __init__(self, port):
         self.com_ports = ["COM1", "COM2", "COM3", "COM4"]
-        self.model = VFDModel(self.com_ports[0])
-        self.view = VFDView(self, self.com_ports)
+        self.selected_port = f"COM{port}"
+        self.model = VFDModel(self.selected_port)
+        self.view = VFDView(self, self.com_ports, self.selected_port)
         self.connected = False
 
     def connect(self, com_port):

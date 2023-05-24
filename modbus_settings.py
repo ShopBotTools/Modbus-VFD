@@ -9,7 +9,7 @@ STOPBITS = 1                            # Number of stop bits
 TIMEOUT = 0.5                           # TIMEOUT time in seconds
 CLEAR_BUFFERS_BEFORE_CALL = True        # Good practice clean up
 CLEAR_BUFFERS_AFTER_CALL  = True        # Good practice clean up
-DEBUG = False
+DEBUG = True
 
 ## P194
 PASSWORD = 0

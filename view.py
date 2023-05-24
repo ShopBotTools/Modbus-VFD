@@ -2,11 +2,11 @@ import tkinter as tk
 from tkinter import font
 
 class VFDView:
-    def __init__(self, controller, com_ports):
+    def __init__(self, controller, com_ports, port):
         self.root = tk.Tk()
         self.com_ports = com_ports
         self.selected_com_port = tk.StringVar()
-        self.selected_com_port.set(self.com_ports[0])  # Set the default selected COM port
+        self.selected_com_port.set(port)  # Set the default selected COM port
         self.controller = controller
 
         self.label_vars = {
