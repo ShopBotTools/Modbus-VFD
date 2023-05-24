@@ -131,7 +131,7 @@ class VFDView:
         self.create_gui()
         self.root.after(0, self.controller.read_vfd())
         self.root.mainloop()
-    
+
     def connect(self):
         selected_port = self.selected_com_port.get()
         self.controller.connect(selected_port)

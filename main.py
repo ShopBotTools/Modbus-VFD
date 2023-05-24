@@ -7,10 +7,7 @@ parser.add_argument("-p", "--port", type=int, help = "Dictates the com port, ent
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    if not args:
-        controller = VFDController(3)
-        controller.start()
-    elif args.port and args.speed:
+    if args.port and args.speed:
         port_string = str(args.port)
         print(f"Port: {port_string}")
         controller = VFDController(port_string)
@@ -18,3 +15,6 @@ if __name__ == "__main__":
         if args.speed:
             print(f"Speed: {args.speed}")
             controller.set_current(args.speed)
+    else:
+        controller = VFDController(3)
+        controller.start()
