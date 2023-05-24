@@ -7,14 +7,17 @@ parser.add_argument("-p", "--port", type=int, help = "Dictates the com port, ent
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    if args.port and args.speed:
-        port_string = str(args.port)
-        print(f"Port: {port_string}")
-        controller = VFDController(port_string)
-        controller.connect(f"COM{port_string}")
-        if args.speed:
-            print(f"Speed: {args.speed}")
-            controller.set_current(args.speed)
-    else:
-        controller = VFDController(3)
-        controller.start()
+    try:
+        if args.port and args.speed:
+            port_string = str(args.port)
+            print(f"Port: {port_string}")
+            controller = VFDController(port_string)
+            controller.connect(f"COM{port_string}")
+            if args.speed:
+                print(f"Speed: {args.speed}")
+                controller.set_current(args.speed)
+        else:
+            controller = VFDController(3)
+            controller.start()
+    except KeyboardInterrupt:
+        print("CTRL+C detected, exiting")

@@ -1,3 +1,4 @@
+import minimalmodbus
 from model import VFDModel
 from view import VFDView
 
@@ -26,8 +27,15 @@ class VFDController:
 
     def read_vfd(self):
         if self.connected:
-            data = self.model.read_VFD()
-            self.view.update_labels(data)
+            try:
+                data = self.model.read_VFD()
+                self.view.update_labels(data)
+            except minimalmodbus.ModbusException as e:
+                # Handle modbus communication error
+                print("Modbus Exception:", e)
+            except Exception as e:
+                # Handle other exceptions
+                print("Exception:", e)
         else:
             self.reconnect()
         self.view.root.after(2000, self.read_vfd)

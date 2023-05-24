@@ -105,6 +105,7 @@ class VFDView:
         # Button to set the current value
         self.set_current_button = tk.Button(self.root, text="Set Current", command=self.set_current)
         self.set_current_button.grid(row=1, column=4, padx=self.X_PADDING)
+        self.root.bind('<Return>', self.set_current)
 
         if self.controller.model.disconnected:
             self.current_entry.configure(state="disabled")
@@ -120,10 +121,12 @@ class VFDView:
     def show_error_message(self, message):
         messagebox.showerror("Error", message)
 
-    def set_current(self):
+    # Optional event parameter is for using enter key
+    def set_current(self, event = None):
         value = self.current_entry.get()
         if value:
             self.controller.set_current(value)
+            self.current_entry.delete(0, 'end')
 
     def update_labels(self, data):
         current = data[0]

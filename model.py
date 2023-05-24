@@ -40,8 +40,15 @@ class VFDModel:
         ## Send the request to the vfd
         def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
             with lock:
-                self.vfd.write_register(register, data, decimals, function_code, signed)
-                self.vfd.serial.close()
+                try:
+                    self.vfd.write_register(register, data, decimals, function_code, signed)
+                    self.vfd.serial.close()
+                except minimalmodbus.ModbusException as e:
+                    # Handle modbus communication error
+                    print("Modbus Exception:", e)
+                except Exception as e:
+                    # Handle other exceptions
+                    print("Exception:", e)
 
         # If the speed has been set correctly then pass on the speed package as
         # well as the register position to the function to send to the VFD
