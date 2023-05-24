@@ -1,5 +1,5 @@
-import minimalmodbus
 import threading
+import minimalmodbus
 import modbus_settings as MB
 import user_inputs
 
@@ -21,6 +21,9 @@ class VFDModel:
             self.vfd.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
             self.vfd.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
             self.vfd.debug = MB.DEBUG
+        except minimalmodbus.ModbusException as e:
+            # Handle modbus communication error
+            print("Modbus Exception:", e)
         except Exception as e:
             print("Exception: ", e)
             self.disconnected = True
@@ -63,4 +66,3 @@ class VFDModel:
             except Exception as e:
                 # Handle other exceptions
                 print("Exception:", e)
-
