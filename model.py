@@ -61,12 +61,12 @@ class VFDModel:
             send_to_vfd(MB.SET_FREQUENCY, speed_package, MB.WRITE_SINGLE_REGISTER)
         return True
 
-    def read_VFD(self):
+    def read_VFD(self, register, read_length):
         # Read data from the device
         with lock:
             try:
                 # Read data from the device
-                data = self.vfd.read_registers(MB.READ_FREQUENCY, MB.READ_LENGTH, MB.READ_REGISTER)
+                data = self.vfd.read_registers(register, read_length, MB.READ_REGISTER)
                 self.vfd.serial.close()
                 return data
 

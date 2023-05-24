@@ -1,6 +1,7 @@
 import minimalmodbus
 from model import VFDModel
 from view import VFDView
+import modbus_settings as MB
 
 class VFDController:
     def __init__(self, port):
@@ -28,7 +29,9 @@ class VFDController:
     def read_vfd(self):
         if self.connected:
             try:
-                data = self.model.read_VFD()
+                frequency_data = self.model.read_VFD(MB.READ_FREQUENCY, MB.READ_LENGTH)
+                load_data = self.model.read_VFD(MB.READ_LOAD, 1)
+                data = [frequency_data, load_data]
                 self.view.update_labels(data)
             except minimalmodbus.ModbusException as e:
                 # Handle modbus communication error
