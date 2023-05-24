@@ -24,6 +24,31 @@ class VFDView:
         self.FONT_BACKGROUND = "white"
         self.X_PADDING = 10
 
+        # Initialize labels
+        self.com_port_label = None
+        self.com_port_dropdown = None
+        self.connect_button = None
+        self.current_label = None
+        self.frequency_label = None
+        self.output_voltage_label = None
+        self.dc_voltage_label = None
+        self.total_power_label = None
+        self.operation_code_label = None
+        self.current_value = None
+        self.frequency_value = None
+        self.output_voltage_value = None
+        self.dc_voltage_value = None
+        self.total_power_value = None
+        self.operation_code_value = None
+        self.current_entry = None
+        self.set_current_button = None
+        self.com_port_dropdown = None
+        self.com_port_dropdown = None
+        self.com_port_dropdown = None
+        self.com_port_dropdown = None
+        self.com_port_dropdown = None
+        self.com_port_dropdown = None
+
     def create_gui(self):
         self.root.title("Spindle Control")
         self.root.config(background=self.WINDOW_BACKGROUND)
@@ -96,10 +121,6 @@ class VFDView:
                 var.set("Disconnected")
 
         self.root.iconbitmap("rpm.ico")
-
-    def connect(self):
-        selected_port = self.selected_com_port.get()
-        self.controller.connect(selected_port)
 
     def update_connection_status(self, status):
         self.label_vars["connection"].set(status)
