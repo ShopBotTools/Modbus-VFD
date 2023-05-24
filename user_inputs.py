@@ -4,7 +4,7 @@
 def set_user_speed(speed):
     try:
         speed_int = int(float(speed)*10)
-    except:
+    except ValueError:
         return "NaN"
     else:
         if isinstance(speed_int, int):

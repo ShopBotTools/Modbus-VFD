@@ -2,7 +2,7 @@
 # General Modbus Settings
 
 MB_ADDRESS = 3                          # Station Address
-USB_PORT = "COM4"                       # Location of USB to RS485 converter
+#USB_PORT = "COM3"                       # Location of USB to RS485 converter
 BAUDRATE = 9600                         # BAUDRATE
 BYTESIZE = 8                            # Number of data bits to be requested
 STOPBITS = 1                            # Number of stop bits
