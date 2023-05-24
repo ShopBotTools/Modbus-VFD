@@ -34,7 +34,9 @@ class VFDController:
 
     def set_current(self, value):
         if self.connected:
-            self.model.write_VFD(value)
+            outcome = self.model.write_VFD(value)
+            if outcome is False:
+                self.view.show_error_message("Please enter a value between 60 and 120")
         else:
             self.reconnect()
 

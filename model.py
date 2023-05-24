@@ -34,6 +34,8 @@ class VFDModel:
 
         if speed_package != "NaN" and speed_package != "OL":
             speed_set = True
+        else:
+            return False
 
         ## Send the request to the vfd
         def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
@@ -50,6 +52,7 @@ class VFDModel:
             send_to_vfd(MB.UNLOCK_PARAMETERS, MB.PASSWORD, MB.WRITE_SINGLE_REGISTER)
             print("Attempting set frequency")
             send_to_vfd(MB.SET_FREQUENCY, speed_package, MB.WRITE_SINGLE_REGISTER)
+        return True
 
     def read_VFD(self):
         # Read data from the device

@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import font
+from tkinter import messagebox
 
 class VFDView:
     def __init__(self, controller, com_ports, port):
@@ -117,7 +118,7 @@ class VFDView:
         self.label_vars["connection"].set(status)
 
     def show_error_message(self, message):
-        tk.messagebox.showerror("Error", message)
+        messagebox.showerror("Error", message)
 
     def set_current(self):
         value = self.current_entry.get()
