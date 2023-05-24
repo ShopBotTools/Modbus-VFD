@@ -6,12 +6,12 @@ import user_inputs
 lock = threading.Lock()
 
 class VFDModel:
-    def __init__(self):
+    def __init__(self, com_port):
         self.disconnected = False
         # Create "instrument" that can perform read and write
         # operations and import it's settings from the modbus settings module
         try:
-            self.vfd = minimalmodbus.Instrument(MB.USB_PORT, MB.MB_ADDRESS)
+            self.vfd = minimalmodbus.Instrument(com_port, MB.MB_ADDRESS)
             self.vfd.mode = minimalmodbus.MODE_RTU
             self.vfd.serial.parity = minimalmodbus.serial.PARITY_NONE
             self.vfd.serial.baudrate = MB.BAUDRATE
@@ -55,6 +55,7 @@ class VFDModel:
                 # Read data from the device
                 data = self.vfd.read_registers(MB.READ_FREQUENCY, MB.READ_LENGTH, MB.READ_REGISTER)
                 self.vfd.serial.close()
+                return data
 
             except minimalmodbus.ModbusException as e:
                 # Handle modbus communication error
@@ -62,6 +63,4 @@ class VFDModel:
             except Exception as e:
                 # Handle other exceptions
                 print("Exception:", e)
-            finally:
-                self.vfd.serial.close()
-                return data
+

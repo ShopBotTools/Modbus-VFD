@@ -2,9 +2,12 @@ import tkinter as tk
 from tkinter import font
 
 class VFDView:
-    def __init__(self, controller):
-        self.controller = controller
+    def __init__(self, controller, com_ports):
         self.root = tk.Tk()
+        self.com_ports = com_ports
+        self.selected_com_port = tk.StringVar()
+        self.selected_com_port.set(self.com_ports[0])  # Set the default selected COM port
+        self.controller = controller
 
         self.label_vars = {
             "current": tk.StringVar(),
@@ -12,7 +15,8 @@ class VFDView:
             "volt": tk.StringVar(),
             "bus": tk.StringVar(),
             "power": tk.StringVar(),
-            "process": tk.StringVar()
+            "process": tk.StringVar(),
+            "connection": tk.StringVar()
         }
 
         self.FONT_SIZE = font.Font(size=15)
@@ -26,6 +30,18 @@ class VFDView:
         self.root.minsize(100, 100)  # width, height
         self.root.maxsize(1000, 1000)
         self.root.geometry("700x200+50+50")  # width x height + x + y
+
+        # COM Port selection dropdown menu
+        self.com_port_label = tk.Label(self.root, text="COM Port", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
+        self.com_port_label.grid(row=0, column=0, padx=self.X_PADDING)
+
+        self.com_port_dropdown = tk.OptionMenu(self.root, self.selected_com_port, *self.com_ports)
+        self.com_port_dropdown.config(font=self.FONT_SIZE)
+        self.com_port_dropdown.grid(row=0, column=1, padx=self.X_PADDING)
+
+        # Connect button
+        self.connect_button = tk.Button(self.root, text="Connect", command=self.connect)
+        self.connect_button.grid(row=0, column=2, padx=self.X_PADDING)
 
         # Column 1, Keys
         self.current_label = tk.Label(self.root, text="Current", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
@@ -81,6 +97,16 @@ class VFDView:
 
         self.root.iconbitmap("rpm.ico")
 
+    def connect(self):
+        selected_port = self.selected_com_port.get()
+        self.controller.connect(selected_port)
+
+    def update_connection_status(self, status):
+        self.label_vars["connection"].set(status)
+
+    def show_error_message(self, message):
+        tk.messagebox.showerror("Error", message)
+
     def set_current(self):
         value = self.current_entry.get()
         if value:
@@ -103,5 +129,21 @@ class VFDView:
 
     def start(self):
         self.create_gui()
-        self.root.after(0, self.controller.read_vfd)
+        self.root.after(0, self.controller.read_vfd())
         self.root.mainloop()
+    
+    def connect(self):
+        selected_port = self.selected_com_port.get()
+        self.controller.connect(selected_port)
+        self.current_entry.configure(state="normal")
+        self.set_current_button.configure(state="normal")
+        for var in self.label_vars.values():
+            var.set("")
+
+        if self.controller.model.disconnected:
+            self.current_entry.configure(state="disabled")
+            self.set_current_button.configure(state="disabled")
+            for var in self.label_vars.values():
+                var.set("Disconnected")
+        else:
+            self.controller.read_vfd()
