@@ -7,18 +7,23 @@ lock = threading.Lock()
 
 class VFDModel:
     def __init__(self):
+        self.disconnected = False
         # Create "instrument" that can perform read and write
         # operations and import it's settings from the modbus settings module
-        self.vfd = minimalmodbus.Instrument(MB.USB_PORT, MB.MB_ADDRESS)
-        self.vfd.mode = minimalmodbus.MODE_RTU
-        self.vfd.serial.parity = minimalmodbus.serial.PARITY_NONE
-        self.vfd.serial.baudrate = MB.BAUDRATE
-        self.vfd.serial.bytesize = MB.BYTESIZE
-        self.vfd.serial.stopbits = MB.STOPBITS
-        self.vfd.serial.timeout  = MB.TIMEOUT
-        self.vfd.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
-        self.vfd.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
-        self.vfd.debug = MB.DEBUG
+        try:
+            self.vfd = minimalmodbus.Instrument(MB.USB_PORT, MB.MB_ADDRESS)
+            self.vfd.mode = minimalmodbus.MODE_RTU
+            self.vfd.serial.parity = minimalmodbus.serial.PARITY_NONE
+            self.vfd.serial.baudrate = MB.BAUDRATE
+            self.vfd.serial.bytesize = MB.BYTESIZE
+            self.vfd.serial.stopbits = MB.STOPBITS
+            self.vfd.serial.timeout  = MB.TIMEOUT
+            self.vfd.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
+            self.vfd.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
+            self.vfd.debug = MB.DEBUG
+        except Exception as e:
+            print("Exception: ", e)
+            self.disconnected = True
 
     def write_VFD(self, user_input):
         speed_set = False

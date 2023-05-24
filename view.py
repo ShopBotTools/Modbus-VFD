@@ -73,6 +73,12 @@ class VFDView:
         self.set_current_button = tk.Button(self.root, text="Set Current", command=self.set_current)
         self.set_current_button.grid(row=1, column=4, padx=self.X_PADDING)
 
+        if self.controller.model.disconnected:
+            self.current_entry.configure(state="disabled")
+            self.set_current_button.configure(state="disabled")
+            for var in self.label_vars.values():
+                var.set("Disconnected")
+
         self.root.iconbitmap("rpm.ico")
 
     def set_current(self):
