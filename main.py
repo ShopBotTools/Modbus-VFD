@@ -1,5 +1,5 @@
-from controller import VFDController
 import argparse
+from controller import VFDController
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--speed", type=int,  help = "Port must be supplied with -p. Change the spindle speed, 60-120 currently")
