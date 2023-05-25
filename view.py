@@ -53,14 +53,23 @@ class VFDView:
         self.load_progress = ttk.Progressbar(self.root, orient="horizontal", mode="determinate", length=250)
         self.load_progress.grid(row=3, column=2, padx=self.X_PADDING, pady=10)
 
-        # Create an entry widget for manual input of current value
+        # Create an entry widget for manual input of spindle speed value
         self.spindle_entry = tk.Entry(self.root, bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.spindle_entry.grid(row=1, column=2, padx=self.X_PADDING)
+        self.spindle_entry.bind('<Return>', self.set_spindle)
 
-        # Button to set the current value
+        # Button to set the spindle speed value
         self.set_spindle_button = tk.Button(self.root, text="Set Spindle Speed", command=self.set_spindle)
         self.set_spindle_button.grid(row=1, column=3, padx=self.X_PADDING)
-        self.root.bind('<Return>', self.set_spindle)
+
+        # Create an entry widget for manual input of frequency value
+        self.frequency_entry = tk.Entry(self.root, bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
+        self.frequency_entry.grid(row=2, column=2, padx=self.X_PADDING)
+        self.frequency_entry.bind('<Return>', self.set_frequency)
+
+        # Button to set the frequency value
+        self.set_frequency_button = tk.Button(self.root, text="Set Frequency", command=self.set_frequency)
+        self.set_frequency_button.grid(row=2, column=3, padx=self.X_PADDING)
 
         # COM Port selection dropdown menu
         self.com_port_label = tk.Label(self.root, text="COM Port", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
@@ -92,8 +101,16 @@ class VFDView:
     def set_spindle(self, event = None):
         value = self.spindle_entry.get()
         if value:
-            self.controller.set_spindle(value)
+            int_value = int(value)
+            self.controller.set_spindle(int_value / 60)
             self.spindle_entry.delete(0, 'end')
+
+    # Optional event parameter is for using enter key
+    def set_frequency(self, event = None):
+        value = self.frequency_entry.get()
+        if value:
+            self.controller.set_frequency(value)
+            self.frequency_entry.delete(0, 'end')
 
     def update_labels(self, data):
         spindle = data[0]
@@ -103,7 +120,7 @@ class VFDView:
         frequency_value = frequency / 10
         frequency_string = f"{frequency_value} Hz"
 
-        self.label_vars["spindle_speed"].set(f"{(spindle/ 10) * frequency_value} RPM")
+        self.label_vars["spindle_speed"].set(f"{(spindle/ 10) * 60} RPM")
         self.label_vars["frequency"].set(frequency_string)
         self.label_vars["load"].set(f"{load}%")
         self.load_progress["value"] = load

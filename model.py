@@ -29,11 +29,13 @@ class VFDModel:
             print("Exception: ", e)
             self.connected = False
 
-    def write_VFD(self, user_input):
+    def write_VFD(self, user_input, entry_to_change):
         if self.connected:
             speed_set = False
-            speed_package = user_inputs.set_user_speed(user_input)
-
+            if entry_to_change == "frequency":
+                speed_package = user_inputs.set_user_frequency(user_input)
+            elif entry_to_change == "spindle":
+                speed_package = user_inputs.set_user_spindle(user_input)
             if speed_package != "NaN" and speed_package != "OL":
                 speed_set = True
             else:

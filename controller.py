@@ -44,7 +44,15 @@ class VFDController:
 
     def set_spindle(self, value):
         if self.connected:
-            outcome = self.model.write_VFD(value)
+            outcome = self.model.write_VFD(value, "frequency")
+            if outcome is False:
+                self.view.show_error_message("Please enter a value between 3600 and 7200")
+        else:
+            self.reconnect()
+
+    def set_frequency(self, value):
+        if self.connected:
+            outcome = self.model.write_VFD(value, "frequency")
             if outcome is False:
                 self.view.show_error_message("Please enter a value between 60 and 120")
         else:
