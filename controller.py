@@ -30,9 +30,7 @@ class VFDController:
         if self.connected:
             try:
                 frequency_data = self.model.read_VFD(MB.READ_FREQUENCY, MB.READ_LENGTH)
-                load_data = self.model.read_VFD(MB.READ_LOAD, 1)
-                data = [frequency_data, load_data]
-                self.view.update_labels(data)
+                self.view.update_labels(frequency_data)
             except minimalmodbus.ModbusException as e:
                 # Handle modbus communication error
                 print("Modbus Exception:", e)
