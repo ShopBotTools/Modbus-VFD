@@ -23,6 +23,21 @@ class VFDView:
         self.FONT_BACKGROUND = "white"
         self.X_PADDING = 10
 
+        self.spindle_label        = None
+        self.frequency_label      = None
+        self.load_label           = None
+        self.spindle_value        = None
+        self.frequency_value      = None
+        self.load_value           = None
+        self.load_progress        = None
+        self.spindle_entry        = None
+        self.set_spindle_button   = None
+        self.frequency_entry      = None
+        self.set_frequency_button = None
+        self.com_port_label       = None
+        self.com_port_dropdown    = None
+        self.connect_button       = None
+
     def create_gui(self):
         self.root.title("Spindle Control")
         self.root.config(background=self.WINDOW_BACKGROUND)
@@ -74,7 +89,6 @@ class VFDView:
         # COM Port selection dropdown menu
         self.com_port_label = tk.Label(self.root, text="COM Port", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.com_port_label.grid(row=4, column=0, padx=self.X_PADDING)
-
         self.com_port_dropdown = tk.OptionMenu(self.root, self.selected_com_port, *self.com_ports)
         self.com_port_dropdown.config(font=self.FONT_SIZE)
         self.com_port_dropdown.grid(row=4, column=1, padx=self.X_PADDING)
