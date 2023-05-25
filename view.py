@@ -97,17 +97,20 @@ class VFDView:
 
     def update_labels(self, data):
         spindle = data[0]
-        frequency = data[0]
-        load = data[1]
+        frequency = data[1]
+        load = data[2]
 
-        self.label_vars["spindle_speed"].set(spindle)
-        self.label_vars["frequency"].set(float(frequency))
-        self.label_vars["load"].set(load)
+        frequency_value = frequency / 10
+        frequency_string = f"{frequency_value} Hz"
+
+        self.label_vars["spindle_speed"].set(f"{(spindle/ 10) * frequency_value} RPM")
+        self.label_vars["frequency"].set(frequency_string)
+        self.label_vars["load"].set(f"{load}%")
         self.load_progress["value"] = load
 
     def start(self):
         self.create_gui()
-        self.root.after(0, self.controller.read_vfd())
+        self.root.after(0, self.controller.read_vfd)
         self.root.mainloop()
 
     def connect(self):

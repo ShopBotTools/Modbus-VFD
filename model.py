@@ -45,13 +45,14 @@ class VFDModel:
                 with lock:
                     try:
                         self.vfd.write_register(register, data, decimals, function_code, signed)
-                        self.vfd.serial.close()
                     except minimalmodbus.ModbusException as e:
                         # Handle modbus communication error
                         print("Modbus Exception:", e)
                     except Exception as e:
                         # Handle other exceptions
                         print("Exception:", e)
+                    # finally:
+                    #     lock.release()
 
         # If the speed has been set correctly then pass on the speed package as
         # well as the register position to the function to send to the VFD
@@ -71,7 +72,6 @@ class VFDModel:
                 try:
                     # Read data from the device
                     data = self.vfd.read_registers(register, read_length, MB.READ_REGISTER)
-                    self.vfd.serial.close()
                     return data
 
                 except minimalmodbus.ModbusException as e:
@@ -80,3 +80,5 @@ class VFDModel:
                 except Exception as e:
                     # Handle other exceptions
                     print("Exception:", e)
+                # finally:
+                #     lock.release()

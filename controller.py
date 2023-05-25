@@ -23,7 +23,8 @@ class VFDController:
 
     def reconnect(self):
         selected_port = self.view.selected_com_port.get()
-        self.model = VFDModel(selected_port)  # Reinitialize the model
+        # if selected_port == self.selected_port:
+        #     return
         self.connect(selected_port)
 
     def read_vfd(self):
@@ -41,7 +42,7 @@ class VFDController:
             self.reconnect()
         self.view.root.after(2000, self.read_vfd)
 
-    def set_current(self, value):
+    def set_spindle(self, value):
         if self.connected:
             outcome = self.model.write_VFD(value)
             if outcome is False:
