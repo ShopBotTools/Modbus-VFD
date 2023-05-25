@@ -131,13 +131,18 @@ class VFDView:
         frequency = data[1]
         load = data[2]
 
-        frequency_value = frequency / 10
-        frequency_string = f"{frequency_value} Hz"
+        spindle_value = round((spindle/ 10) * 60, 1)
 
-        self.label_vars["spindle_speed"].set(f"{(spindle/ 10) * 60} RPM")
-        self.label_vars["frequency"].set(frequency_string)
-        self.label_vars["load"].set(f"{load}%")
-        self.load_progress["value"] = load
+        frequency_value = round(frequency / 10, 1)
+
+        # Divide the decimal response by the highest possible value of 1 byte (255)
+        # Then multiply that number by 100 to produce a percentage
+        load_percentage = round((load / 255) * 100)
+
+        self.label_vars["spindle_speed"].set(f"{spindle_value} RPM")
+        self.label_vars["frequency"].set(f"{frequency_value} Hz")
+        self.label_vars["load"].set(f"{load_percentage}%")
+        self.load_progress["value"] = load_percentage
 
     def start(self):
         self.create_gui()
