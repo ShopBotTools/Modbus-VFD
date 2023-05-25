@@ -3,9 +3,15 @@ from model import VFDModel
 from view import VFDView
 import modbus_settings as MB
 
+def generate_port_list():
+    port_list = []
+    for i in range(1, 21):
+        port_list.append(f"COM{i}")
+    return port_list
+
 class VFDController:
     def __init__(self, port):
-        self.com_ports = ["COM1", "COM2", "COM3", "COM4"]
+        self.com_ports = generate_port_list()
         self.selected_port = f"COM{port}"
         self.model = VFDModel(self.selected_port)
         self.view = VFDView(self, self.com_ports, self.selected_port)
