@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import font
 from tkinter import messagebox
 
@@ -44,11 +45,7 @@ class VFDView:
         self.current_entry        = None
         self.set_current_button   = None
         self.com_port_dropdown    = None
-        self.com_port_dropdown    = None
-        self.com_port_dropdown    = None
-        self.com_port_dropdown    = None
-        self.com_port_dropdown    = None
-        self.com_port_dropdown    = None
+        self.load_progress        = None
 
     def create_gui(self):
         self.root.title("Spindle Control")
@@ -107,6 +104,9 @@ class VFDView:
         self.load_value = tk.Label(self.root, textvariable=self.label_vars["load"], bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.load_value.grid(row=6, column=2, padx=self.X_PADDING)
 
+        self.load_progress = ttk.Progressbar(self.root, orient="horizontal", mode="determinate", length=250)
+        self.load_progress.grid(row=6, column=3, padx=self.X_PADDING, pady=10)
+
         # Create an entry widget for manual input of current value
         self.current_entry = tk.Entry(self.root, bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.current_entry.grid(row=1, column=3, padx=self.X_PADDING)
@@ -146,12 +146,13 @@ class VFDView:
         not_used = data[0][5]
         load = data[1][0]
 
-        self.label_vars["current"].set(f"{current / 10}A")
-        self.label_vars["hirz"].set(f"{float(hirz / 100)}Hz")
-        self.label_vars["volt"].set(f"{volt}V")
-        self.label_vars["bus"].set(f"{bus}V")
-        self.label_vars["power"].set(f"{power / 10}kW")
-        self.label_vars["load"].set(f"{load}%")
+        self.label_vars["current"].set(current)
+        self.label_vars["hirz"].set(float(hirz))
+        self.label_vars["volt"].set(volt)
+        self.label_vars["bus"].set(bus)
+        self.label_vars["power"].set(power)
+        self.label_vars["load"].set(load)
+        self.load_progress["value"] = load
 
     def start(self):
         self.create_gui()
