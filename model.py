@@ -7,7 +7,7 @@ lock = threading.Lock()
 
 class VFDModel:
     def __init__(self, com_port):
-        self.disconnected = False
+        self.connected = False
         # Create "instrument" that can perform read and write
         # operations and import it's settings from the modbus settings module
         try:
@@ -21,34 +21,37 @@ class VFDModel:
             self.vfd.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
             self.vfd.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
             self.vfd.debug = MB.DEBUG
+            self.connected = True
         except minimalmodbus.ModbusException as e:
             # Handle modbus communication error
             print("Modbus Exception:", e)
         except Exception as e:
             print("Exception: ", e)
-            self.disconnected = True
+            self.connected = False
 
     def write_VFD(self, user_input):
-        speed_set = False
-        speed_package = user_inputs.set_user_speed(user_input)
+        if self.connected:
+            speed_set = False
+            speed_package = user_inputs.set_user_speed(user_input)
 
-        if speed_package != "NaN" and speed_package != "OL":
-            speed_set = True
-        else:
-            return False
+            if speed_package != "NaN" and speed_package != "OL":
+                speed_set = True
+            else:
+                return False
 
         ## Send the request to the vfd
         def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
-            with lock:
-                try:
-                    self.vfd.write_register(register, data, decimals, function_code, signed)
-                    self.vfd.serial.close()
-                except minimalmodbus.ModbusException as e:
-                    # Handle modbus communication error
-                    print("Modbus Exception:", e)
-                except Exception as e:
-                    # Handle other exceptions
-                    print("Exception:", e)
+            if self.connected:
+                with lock:
+                    try:
+                        self.vfd.write_register(register, data, decimals, function_code, signed)
+                        self.vfd.serial.close()
+                    except minimalmodbus.ModbusException as e:
+                        # Handle modbus communication error
+                        print("Modbus Exception:", e)
+                    except Exception as e:
+                        # Handle other exceptions
+                        print("Exception:", e)
 
         # If the speed has been set correctly then pass on the speed package as
         # well as the register position to the function to send to the VFD
@@ -63,16 +66,17 @@ class VFDModel:
 
     def read_VFD(self, register, read_length):
         # Read data from the device
-        with lock:
-            try:
-                # Read data from the device
-                data = self.vfd.read_registers(register, read_length, MB.READ_REGISTER)
-                self.vfd.serial.close()
-                return data
+        if self.connected:
+            with lock:
+                try:
+                    # Read data from the device
+                    data = self.vfd.read_registers(register, read_length, MB.READ_REGISTER)
+                    self.vfd.serial.close()
+                    return data
 
-            except minimalmodbus.ModbusException as e:
-                # Handle modbus communication error
-                print("Modbus Exception:", e)
-            except Exception as e:
-                # Handle other exceptions
-                print("Exception:", e)
+                except minimalmodbus.ModbusException as e:
+                    # Handle modbus communication error
+                    print("Modbus Exception:", e)
+                except Exception as e:
+                    # Handle other exceptions
+                    print("Exception:", e)

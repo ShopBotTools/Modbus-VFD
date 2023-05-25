@@ -116,7 +116,7 @@ class VFDView:
         self.set_current_button.grid(row=1, column=4, padx=self.X_PADDING)
         self.root.bind('<Return>', self.set_current)
 
-        if self.controller.model.disconnected:
+        if not self.controller.model.connected:
             self.current_entry.configure(state="disabled")
             self.set_current_button.configure(state="disabled")
             for var in self.label_vars.values():
@@ -166,7 +166,7 @@ class VFDView:
         for var in self.label_vars.values():
             var.set("")
 
-        if self.controller.model.disconnected:
+        if not self.controller.model.connected:
             self.current_entry.configure(state="disabled")
             self.set_current_button.configure(state="disabled")
             for var in self.label_vars.values():
