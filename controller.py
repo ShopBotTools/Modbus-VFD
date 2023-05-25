@@ -46,7 +46,7 @@ class VFDController:
         if self.connected:
             outcome = self.model.write_VFD(value, "frequency")
             if outcome is False:
-                self.view.show_error_message("Please enter a value between 3600 and 7200")
+                self.view.show_error_message("Please enter a value between 7200 and 18000")
         else:
             self.reconnect()
 
@@ -54,7 +54,7 @@ class VFDController:
         if self.connected:
             outcome = self.model.write_VFD(value, "frequency")
             if outcome is False:
-                self.view.show_error_message("Please enter a value between 60 and 120")
+                self.view.show_error_message("Please enter a value between 120 and 300")
         else:
             self.reconnect()
 

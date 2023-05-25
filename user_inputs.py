@@ -10,7 +10,7 @@ def set_user_spindle(user_input):
         return "NaN"
     else:
         if isinstance(speed_int, int):
-            if speed_int >=3600 and speed_int <=7200:
+            if speed_int >=7200 and speed_int <=16000:
                 return speed_int
             else:
                 return "OL"
@@ -26,7 +26,7 @@ def set_user_frequency(user_input):
         return "NaN"
     else:
         if isinstance(speed_int, int):
-            if speed_int >=600 and speed_int <=1200:
+            if speed_int >=1200 and speed_int <=3000:
                 return speed_int
             else:
                 return "OL"
