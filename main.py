@@ -1,5 +1,6 @@
 import argparse
 from controller import VFDController
+import modbus_settings as MB
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--speed", type=int,  help = "Port must be supplied with -p. Change the spindle speed, 7200-18000 currently")
@@ -23,7 +24,7 @@ if __name__ == "__main__":
             int_frequency = int(args.frequency)
             controller.set_frequency(int_frequency)
         else:
-            controller = VFDController(3)
+            controller = VFDController(MB.USB_PORT)
             controller.start()
     except KeyboardInterrupt:
         print("CTRL+C detected, exiting")
