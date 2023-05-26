@@ -1,8 +1,23 @@
 # Set the Modbus paramaters in here for both reading and writing to the VFD
 # General Modbus Settings
+import re
+import serial.tools.list_ports
+
+def get_com_port():
+    # Get a list of all available ports
+    available_ports = list(serial.tools.list_ports.comports())
+    
+    pattern = r"ShopBot Controller \((COM\d+)\)"
+    for port in available_ports:
+        match = re.match(pattern, port.description)
+        if match:
+            return match.group(1)
+    
+    return None
+
 
 MB_ADDRESS = 3                          # Station Address
-USB_PORT = 3                            # Com port of USB to RS485 converter
+COM_PORT = get_com_port()
 BAUDRATE = 9600                         # BAUDRATE
 BYTESIZE = 8                            # Number of data bits to be requested
 STOPBITS = 1                            # Number of stop bits

@@ -24,7 +24,7 @@ if __name__ == "__main__":
             int_frequency = int(args.frequency)
             controller.set_frequency(int_frequency)
         else:
-            controller = VFDController(MB.USB_PORT)
+            controller = VFDController(MB.COM_PORT)
             controller.start()
     except KeyboardInterrupt:
         print("CTRL+C detected, exiting")

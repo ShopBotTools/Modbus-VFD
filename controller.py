@@ -12,7 +12,7 @@ def generate_port_list():
 class VFDController:
     def __init__(self, port):
         self.com_ports = generate_port_list()
-        self.selected_port = f"COM{port}"
+        self.selected_port = port
         self.model = VFDModel(self.selected_port)
         self.view = VFDView(self, self.com_ports, self.selected_port)
         self.connected = False
