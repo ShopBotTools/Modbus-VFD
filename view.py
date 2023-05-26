@@ -159,12 +159,16 @@ class VFDView:
         self.controller.connect(selected_port)
         self.spindle_entry.configure(state="normal")
         self.set_spindle_button.configure(state="normal")
+        self.frequency_entry.configure(state="normal")
+        self.set_frequency_button.configure(state="normal")
         for var in self.label_vars.values():
             var.set("")
 
         if not self.controller.model.connected:
             self.spindle_entry.configure(state="disabled")
             self.set_spindle_button.configure(state="disabled")
+            self.frequency_entry.configure(state="disabled")
+            self.set_frequency_button.configure(state="disabled")
             for var in self.label_vars.values():
                 var.set("Disconnected")
         else:

@@ -53,8 +53,6 @@ class VFDModel:
                     except Exception as e:
                         # Handle other exceptions
                         print("Exception:", e)
-                    # finally:
-                    #     lock.release()
 
         # If the speed has been set correctly then pass on the speed package as
         # well as the register position to the function to send to the VFD
@@ -82,5 +80,3 @@ class VFDModel:
                 except Exception as e:
                     # Handle other exceptions
                     print("Exception:", e)
-                # finally:
-                #     lock.release()
