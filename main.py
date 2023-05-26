@@ -18,7 +18,7 @@ if __name__ == "__main__":
             controller.connect(MB.COM_PORT)
             int_frequency = int(args.frequency)
             controller.set_frequency(int_frequency)
-        elif not args:
+        if args.speed is None and args.frequency is None:
             try:
                 controller.start()
             except KeyboardInterrupt:
