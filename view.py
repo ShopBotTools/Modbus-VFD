@@ -108,7 +108,7 @@ class VFDView:
             for var in self.label_vars.values():
                 var.set("Disconnected")
 
-        self.root.iconbitmap("rpm.ico")
+        #self.root.iconbitmap("rpm.ico")
 
     def update_connection_status(self, status):
         self.label_vars["connection"].set(status)
