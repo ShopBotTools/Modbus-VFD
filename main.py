@@ -3,8 +3,7 @@ from controller import VFDController
 import modbus_settings as MB
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-s", "--speed", type=int,  help = "Change the spindle speed, 7200-18000 currently")
-parser.add_argument("-f", "--frequency", type=int,  help = "Change the frequency, 120-300 currently")
+parser.add_argument('speed', type=int, nargs='?', default=None)
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -14,11 +13,7 @@ if __name__ == "__main__":
         controller.connect(MB.COM_PORT)
         int_speed = int(args.speed)
         controller.set_spindle(int_speed / 60)
-    if args.frequency:
-        controller.connect(MB.COM_PORT)
-        int_frequency = int(args.frequency)
-        controller.set_frequency(int_frequency)
-    if args.speed is None and args.frequency is None:
+    if args.speed is None:
         try:
             controller.start()
         except KeyboardInterrupt:
