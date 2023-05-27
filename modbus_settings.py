@@ -6,13 +6,13 @@ import serial.tools.list_ports
 def get_com_port():
     # Get a list of all available ports
     available_ports = list(serial.tools.list_ports.comports())
-    
+
     pattern = r"ShopBot Controller \((COM\d+)\)"
     for port in available_ports:
         match = re.match(pattern, port.description)
         if match:
             return match.group(1)
-    
+
     return None
 
 

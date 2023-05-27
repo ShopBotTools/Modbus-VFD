@@ -43,7 +43,7 @@ class VFDView:
         self.root.config(background=self.WINDOW_BACKGROUND)
         self.root.minsize(100, 100)  # width, height
         self.root.maxsize(1000, 1000)
-        self.root.geometry("750x175+50+50")  # width x height + x + y
+        self.root.geometry("750x175+165+735")  # width x height + x + y
 
         # Column 1, Keys
         self.spindle_label = tk.Label(self.root, text="Spindle Speed", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
