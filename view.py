@@ -21,6 +21,8 @@ class VFDView:
         self.WINDOW_BACKGROUND = "white"
         self.FONT_BACKGROUND = "white"
         self.X_PADDING = 10
+        self.Y_PADDING = 10
+        self.LOAD_BAR_SIZE = 250
 
         self.spindle_label        = None
         self.actual_speed_label   = None
@@ -34,13 +36,15 @@ class VFDView:
         self.com_port_label       = None
         self.com_port_dropdown    = None
         self.connect_button       = None
+        self.increment_button     = None
+        self.decrement_button     = None
 
     def create_gui(self):
         self.root.title("Spindle Control")
         self.root.config(background=self.WINDOW_BACKGROUND)
         self.root.minsize(100, 100)  # width, height
         self.root.maxsize(1000, 1000)
-        self.root.geometry("750x175+165+735")  # width x height + x + y
+        self.root.geometry("850x175+165+735")  # width x height + x + y
 
         # Column 1, Keys
         self.spindle_label = tk.Label(self.root, text="Spindle Speed", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
@@ -56,13 +60,20 @@ class VFDView:
         self.load_value = tk.Label(self.root, textvariable=self.label_vars["load"], bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.load_value.grid(row=2, column=1, padx=self.X_PADDING)
 
-        self.load_progress = ttk.Progressbar(self.root, orient="horizontal", mode="determinate", length=250)
-        self.load_progress.grid(row=2, column=2, padx=self.X_PADDING, pady=10)
+        self.load_progress = ttk.Progressbar(self.root, orient="horizontal", mode="determinate", length=self.LOAD_BAR_SIZE)
+        self.load_progress.grid(row=2, column=2, padx=self.X_PADDING, pady=self.Y_PADDING)
 
         # Create an entry widget for manual input of spindle speed value
         self.spindle_entry = tk.Entry(self.root, bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.spindle_entry.grid(row=1, column=2, padx=self.X_PADDING)
-        self.spindle_entry.bind('<Return>', self.set_spindle)
+
+        def on_return(event):
+            self.set_spindle()
+        self.spindle_entry.bind('<Return>', on_return)
+
+        def on_focus_out(event):
+            self.root.focus_set()
+        self.spindle_entry.bind('<FocusOut>', on_focus_out)
 
         # Button to set the spindle speed value
         self.set_spindle_button = tk.Button(self.root, text="Set Spindle Speed", command=self.set_spindle)
@@ -74,12 +85,24 @@ class VFDView:
         self.com_port_label.grid(row=3, column=0, padx=self.X_PADDING)
         self.com_port_dropdown = tk.OptionMenu(self.root, self.selected_com_port, *self.com_ports)
         self.com_port_dropdown.config(font=self.FONT_SIZE)
-        self.com_port_dropdown.grid(row=3, column=1, padx=self.X_PADDING, sticky="e")  # Set sticky parameter to "e" for right alignment
+        self.com_port_dropdown.grid(row=3, column=1, padx=self.X_PADDING, sticky="e")
 
         # Connect button
         self.connect_button = tk.Button(self.root, text="Connect", command=self.connect)
         self.connect_button.config(font=self.FONT_SIZE)
-        self.connect_button.grid(row=3, column=2, padx=self.X_PADDING, sticky="w")  # Set sticky parameter to "w" for left alignment
+        self.connect_button.grid(row=3, column=2, padx=self.X_PADDING)
+
+        # Increment, + button
+        self.increment_button = tk.Button(self.root, text="+", command=self.increment_spindle)
+        self.increment_button.config(font=self.FONT_SIZE)
+        self.increment_button.grid(row=1, column=4, padx=self.X_PADDING)
+        self.root.bind('=', self.increment_spindle)
+
+        # Decrement, - button
+        self.decrement_button = tk.Button(self.root, text="-", command=self.decrement_spindle)
+        self.decrement_button.config(font=self.FONT_SIZE)
+        self.decrement_button.grid(row=1, column=5, padx=self.X_PADDING)
+        self.root.bind('-', self.decrement_spindle)
 
         if not self.controller.model.connected:
             self.spindle_entry.configure(state="disabled")
@@ -103,18 +126,37 @@ class VFDView:
             self.controller.set_spindle(int_value / 60)
             self.spindle_entry.delete(0, 'end')
 
-    def update_labels(self, data):
-        spindle = data[0]
-        # frequency = data[1]
-        load = data[2]
-        test = data[3]
+    def increment_spindle(self, event = None):
+        value = self.label_vars["spindle_speed"].get()
+        if value:
+            int_value = int(value)
+            self.controller.set_spindle((int_value / 60) + 100)
 
-        spindle_value = round((spindle/ 10) * 60, 1)
+    def decrement_spindle(self, event = None):
+        value = self.label_vars["spindle_speed"].get()
+        if value:
+            int_value = int(value)
+            self.controller.set_spindle((int_value / 60) - 100)
+
+    def update_labels(self, data):
+        spindle                = data[0]
+        # frequency            = data[1]
+        load                   = data[2]
+        # operation_status     = data[3]
+        # direction            = data[4]
+        # control_mode         = data[5] # P100
+        # speed_command_source = data[6]
+        # auto_manual_status   = data[7]
+        # present_fault        = data[8]
+        # command_rotation     = data[9]
+
+        spindle_value = round((spindle/ 10) * 60)
+        spindle_value = int(spindle_value)
 
         # Divide the decimal response by the highest possible value of 1 byte (256)
         load_percentage = round(load / 256)
 
-        self.label_vars["spindle_speed"].set(f"{spindle_value} RPM")
+        self.label_vars["spindle_speed"].set(spindle_value)
         self.label_vars["load"].set(f"{load_percentage}%")
         self.load_progress["value"] = load_percentage
 

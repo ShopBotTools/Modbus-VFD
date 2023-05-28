@@ -57,13 +57,5 @@ class VFDController:
         else:
             self.reconnect()
 
-    def set_frequency(self, value):
-        if self.connected:
-            outcome = self.model.write_VFD(value, "frequency")
-            if outcome is False:
-                self.view.show_error_message("Please enter a value between 120 and 300")
-        else:
-            self.reconnect()
-
     def start(self):
         self.view.start()
