@@ -130,13 +130,13 @@ class VFDView:
         value = self.label_vars["spindle_speed"].get()
         if value:
             int_value = int(value)
-            self.controller.set_spindle((int_value / 60) + 100)
+            self.controller.adjust_spindle(int_value + 100)
 
     def decrement_spindle(self, event = None):
         value = self.label_vars["spindle_speed"].get()
         if value:
             int_value = int(value)
-            self.controller.set_spindle((int_value / 60) - 100)
+            self.controller.adjust_spindle(int_value - 100)
 
     def update_labels(self, data):
         spindle                = data[0]

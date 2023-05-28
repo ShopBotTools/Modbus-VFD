@@ -57,5 +57,13 @@ class VFDController:
         else:
             self.reconnect()
 
+    def adjust_spindle(self, value):
+        if self.connected:
+            outcome = self.model.write_VFD(value, "spindle")
+            if outcome is False:
+                self.view.show_error_message("Please enter a value between 7200 and 18000")
+        else:
+            self.reconnect()
+
     def start(self):
         self.view.start()
