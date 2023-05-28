@@ -105,13 +105,14 @@ class VFDView:
 
     def update_labels(self, data):
         spindle = data[0]
+        # frequency = data[1]
         load = data[2]
+        test = data[3]
 
         spindle_value = round((spindle/ 10) * 60, 1)
 
-        # Divide the decimal response by the highest possible value of 1 byte (255)
-        # Then multiply that number by 100 to produce a percentage
-        load_percentage = round((load / 255) * 100)
+        # Divide the decimal response by the highest possible value of 1 byte (256)
+        load_percentage = round(load / 256)
 
         self.label_vars["spindle_speed"].set(f"{spindle_value} RPM")
         self.label_vars["load"].set(f"{load_percentage}%")
