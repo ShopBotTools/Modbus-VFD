@@ -8,7 +8,10 @@ class VFDView:
         self.root = tk.Tk()
         self.com_ports = com_ports
         self.selected_com_port = tk.StringVar()
+        self.selected_adjustment_options = [10, 100, 1000]
+        self.selected_adjustment = tk.StringVar()
         self.selected_com_port.set(port)  # Set the default selected COM port
+        self.selected_adjustment.set(self.selected_adjustment_options[2])
         self.controller = controller
 
         self.label_vars = {
@@ -44,7 +47,7 @@ class VFDView:
         self.root.config(background=self.WINDOW_BACKGROUND)
         self.root.minsize(100, 100)  # width, height
         self.root.maxsize(1000, 1000)
-        self.root.geometry("850x175+165+735")  # width x height + x + y
+        self.root.geometry("950x175+165+735")  # width x height + x + y
 
         # Column 1, Keys
         self.spindle_label = tk.Label(self.root, text="Spindle Speed", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
@@ -92,17 +95,22 @@ class VFDView:
         self.connect_button.config(font=self.FONT_SIZE)
         self.connect_button.grid(row=3, column=2, padx=self.X_PADDING)
 
-        # Increment, + button
-        self.increment_button = tk.Button(self.root, text="+", command=self.increment_spindle)
-        self.increment_button.config(font=self.FONT_SIZE)
-        self.increment_button.grid(row=1, column=4, padx=self.X_PADDING)
-        self.root.bind('=', self.increment_spindle)
-
         # Decrement, - button
         self.decrement_button = tk.Button(self.root, text="-", command=self.decrement_spindle)
         self.decrement_button.config(font=self.FONT_SIZE)
-        self.decrement_button.grid(row=1, column=5, padx=self.X_PADDING)
+        self.decrement_button.grid(row=1, column=4, padx=self.X_PADDING)
         self.root.bind('-', self.decrement_spindle)
+
+        # Increment dropdown menu
+        self.adjustment_dropdown = tk.OptionMenu(self.root, self.selected_adjustment, *self.selected_adjustment_options)
+        self.adjustment_dropdown.config(font=self.FONT_SIZE)
+        self.adjustment_dropdown.grid(row=1, column=5, padx=self.X_PADDING)
+
+        # Increment, + button
+        self.increment_button = tk.Button(self.root, text="+", command=self.increment_spindle)
+        self.increment_button.config(font=self.FONT_SIZE)
+        self.increment_button.grid(row=1, column=6, padx=self.X_PADDING)
+        self.root.bind('=', self.increment_spindle)
 
         if not self.controller.model.connected:
             self.spindle_entry.configure(state="disabled")
@@ -130,13 +138,13 @@ class VFDView:
         value = self.label_vars["spindle_speed"].get()
         if value:
             int_value = int(value)
-            self.controller.adjust_spindle(int_value + 100)
+            self.controller.adjust_spindle(int_value + int(self.selected_adjustment.get()))
 
     def decrement_spindle(self, event = None):
         value = self.label_vars["spindle_speed"].get()
         if value:
             int_value = int(value)
-            self.controller.adjust_spindle(int_value - 100)
+            self.controller.adjust_spindle(int_value - int(self.selected_adjustment.get()))
 
     def update_labels(self, data):
         spindle                = data[0]

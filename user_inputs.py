@@ -11,6 +11,7 @@ def set_user_spindle(user_input):
     else:
         if isinstance(speed_int, int):
             if speed_int >=7200 and speed_int <=18000:
+                # convert to frequency after validating input
                 speed_int = round((speed_int / 60) * 10)
                 return speed_int
             else:
