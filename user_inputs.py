@@ -34,4 +34,3 @@ def set_user_frequency(user_input):
                 return "OL"
         else:
             return "NaN"
-

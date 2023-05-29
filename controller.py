@@ -29,8 +29,6 @@ class VFDController:
 
     def reconnect(self):
         selected_port = self.view.selected_com_port.get()
-        # if selected_port == self.selected_port:
-        #     return
         self.connect(selected_port)
 
     def read_vfd(self):
