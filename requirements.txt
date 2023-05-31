@@ -1,3 +1,3 @@
 minimalmodbus
 argparse
-pyinstaller==3.6
+pyinstaller
