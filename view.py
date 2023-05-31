@@ -8,7 +8,7 @@ import re
 # Create transparent icon to replace the default
 ICON = zlib.decompress(base64.b64decode('eJxjYGAEQgEBBiDJwZDBy'
     'sAgxsDAoAHEQCEGBQaIOAg4sDIgACMUj4JRMApGwQgF/ykEAFXxQRc='))
- 
+
 _, ICON_PATH = tempfile.mkstemp()
 with open(ICON_PATH, 'wb') as icon_file:
     icon_file.write(ICON)
@@ -61,12 +61,31 @@ class VFDView:
         self.adjustment_dropdown  = None
         self.override_label       = None
 
+    def center_window(self, width, height):
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        return x, y
+
     def create_gui(self):
         self.root.title("Spindle Control")
         self.root.config(background=self.WINDOW_BACKGROUND)
-        self.root.minsize(100, 100)  # width, height
+        self.root.minsize(100, 100)
         self.root.maxsize(1000, 1000)
-        self.root.geometry("850x100+165+735")  # width x height + x + y
+
+        # Set the desired width and height for your app
+        width = 850
+        height = 100
+
+        # Center the window based on screen size
+        x, y = self.center_window(width, height)
+
+        # Adjust the window position
+        x -= 375
+        y += 250
+
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
 
         # Column 1, Keys
         self.spindle_label = tk.Label(self.root, text="Spindle Speed", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
