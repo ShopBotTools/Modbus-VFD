@@ -61,10 +61,10 @@ class VFDView:
         self.adjustment_dropdown  = None
         self.override_label       = None
 
-    def center_window(self, width, height):
+    def position_window(self, width, height):
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
-        x = (screen_width // 2) - (width // 2)
+        x = (screen_width) - (width)
         y = (screen_height // 2) - (height // 2)
         return x, y
 
@@ -79,10 +79,10 @@ class VFDView:
         height = 100
 
         # Center the window based on screen size
-        x, y = self.center_window(width, height)
+        x, y = self.position_window(width, height)
 
         # Adjust the window position
-        x -= 0
+        x -= 25
         y += 250
 
         self.root.geometry(f"{width}x{height}+{x}+{y}")
