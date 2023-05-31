@@ -75,14 +75,14 @@ class VFDView:
         self.root.maxsize(1000, 1000)
 
         # Set the desired width and height for your app
-        width = 850
+        width = 900
         height = 100
 
         # Center the window based on screen size
         x, y = self.center_window(width, height)
 
         # Adjust the window position
-        x -= 375
+        x -= 0
         y += 250
 
         self.root.geometry(f"{width}x{height}+{x}+{y}")
@@ -127,7 +127,7 @@ class VFDView:
         self.com_port_label.grid(row=2, column=3, padx=self.X_PADDING, sticky="e")
         self.com_port_dropdown = tk.OptionMenu(self.root, self.selected_com_port, *self.com_ports)
         self.com_port_dropdown.config(font=10)
-        self.com_port_dropdown.grid(row=2, column=4, padx=self.X_PADDING, sticky="e")
+        self.com_port_dropdown.grid(row=2, column=4, padx=self.X_PADDING, pady=self.Y_PADDING, sticky="e")
 
         # Connect button
         self.connect_button = tk.Button(self.root, text="Connect", command=self.connect)
@@ -135,7 +135,7 @@ class VFDView:
         self.connect_button.grid(row=2, column=5, padx=self.X_PADDING, sticky="w")
 
         # Decrement, - button
-        self.decrement_button = tk.Button(self.root, text="-", command=self.decrement_spindle)
+        self.decrement_button = tk.Button(self.root, text="  -  ", command=self.decrement_spindle)
         self.decrement_button.config(font=self.FONT_SIZE)
         self.decrement_button.grid(row=1, column=5, padx=0, sticky="w")
         self.root.bind('-', self.decrement_spindle)
@@ -146,9 +146,9 @@ class VFDView:
         self.adjustment_dropdown.grid(row=1, column=4, padx=5, sticky="e")
 
         # Increment, + button
-        self.increment_button = tk.Button(self.root, text="+", command=self.increment_spindle)
+        self.increment_button = tk.Button(self.root, text="  +  ", command=self.increment_spindle)
         self.increment_button.config(font=self.FONT_SIZE)
-        self.increment_button.grid(row=1, column=5, padx=0)
+        self.increment_button.grid(row=1, column=5, padx=50)
         self.root.bind('=', self.increment_spindle)
 
         # Override label
