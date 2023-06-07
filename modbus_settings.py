@@ -21,10 +21,10 @@ COM_PORT = get_com_port()
 BAUDRATE = 9600                         # BAUDRATE
 BYTESIZE = 8                            # Number of data bits to be requested
 STOPBITS = 1                            # Number of stop bits
-TIMEOUT = 0.5                           # TIMEOUT time in seconds
+TIMEOUT = 0.25                           # TIMEOUT time in seconds
 CLEAR_BUFFERS_BEFORE_CALL = True        # Good practice clean up
 CLEAR_BUFFERS_AFTER_CALL  = True        # Good practice clean up
-DEBUG = True
+DEBUG = False
 
 # P194
 PASSWORD = 0
@@ -38,8 +38,6 @@ UNLOCK_PARAMETERS = 49
 
 # Bits
 COMMAND_DRIVE_SECURITY_BIT = 2
-BIT_TRUE  = True
-BIT_FALSE = False
 
 # Define Modbus function codes
 READ_REGISTER         = 3
