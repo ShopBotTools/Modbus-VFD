@@ -57,12 +57,16 @@ class VFDModel:
         # If the speed has been set correctly then pass on the speed package as
         # well as the register position to the function to send to the VFD
         if speed_set:
-            print("Attempting unlock drive")
+#            print("Attempting unlock drive")
             send_to_vfd(MB.UNLOCK_DRIVE, MB.PASSWORD, MB.WRITE_SINGLE_REGISTER)
-            print("Attempting unlock parameters")
+#            print("Attempting unlock parameters")
             send_to_vfd(MB.UNLOCK_PARAMETERS, MB.PASSWORD, MB.WRITE_SINGLE_REGISTER)
-            print("Attempting set frequency")
+#            print("Attempting set frequency")
             send_to_vfd(MB.SET_FREQUENCY, speed_package, MB.WRITE_SINGLE_REGISTER)
+#            print("Attempting to set security bit to true")
+            send_to_vfd(MB.COMMAND_DRIVE, MB.COMMAND_DRIVE_SECURITY_BIT, MB.WRITE_SINGLE_REGISTER)
+            # DEBUG so that command prompt does not immediately dissapear
+            # input()
         return True
 
     def read_VFD(self, register, read_length):

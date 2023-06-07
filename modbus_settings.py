@@ -24,16 +24,22 @@ STOPBITS = 1                            # Number of stop bits
 TIMEOUT = 0.5                           # TIMEOUT time in seconds
 CLEAR_BUFFERS_BEFORE_CALL = True        # Good practice clean up
 CLEAR_BUFFERS_AFTER_CALL  = True        # Good practice clean up
-DEBUG = False
+DEBUG = True
 
-## P194
+# P194
 PASSWORD = 0
 
-## Registers
+# Registers
+COMMAND_DRIVE     = 1
 READ_FREQUENCY    = 24
 SET_FREQUENCY     = 44
 UNLOCK_DRIVE      = 48
 UNLOCK_PARAMETERS = 49
+
+# Bits
+COMMAND_DRIVE_SECURITY_BIT = 2
+BIT_TRUE  = True
+BIT_FALSE = False
 
 # Define Modbus function codes
 READ_REGISTER         = 3
