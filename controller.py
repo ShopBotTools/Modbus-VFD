@@ -44,7 +44,7 @@ class VFDController:
                 print("Exception:", e)
         else:
             self.reconnect()
-        self.view.root.after(2000, self.read_vfd)
+        self.view.root.after(1000, self.read_vfd)
 
     def set_spindle(self, value):
         if self.connected:

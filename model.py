@@ -9,7 +9,7 @@ class VFDModel:
     def __init__(self, com_port):
         self.connected = False
         # Create "instrument" that can perform read and write
-        # operations and import it's settings from the modbus settings module
+        # operations and import its settings from the modbus settings module
         try:
             self.vfd = minimalmodbus.Instrument(com_port, MB.MB_ADDRESS)
             self.vfd.mode = minimalmodbus.MODE_RTU
@@ -17,7 +17,7 @@ class VFDModel:
             self.vfd.serial.baudrate = MB.BAUDRATE
             self.vfd.serial.bytesize = MB.BYTESIZE
             self.vfd.serial.stopbits = MB.STOPBITS
-            self.vfd.serial.timeout  = MB.TIMEOUT
+            self.vfd.serial.timeout = MB.TIMEOUT
             self.vfd.clear_buffers_before_each_transaction = MB.CLEAR_BUFFERS_BEFORE_CALL
             self.vfd.close_port_after_each_call = MB.CLEAR_BUFFERS_AFTER_CALL
             self.vfd.debug = MB.DEBUG
@@ -25,13 +25,17 @@ class VFDModel:
         except minimalmodbus.ModbusException as e:
             # Handle modbus communication error
             print("Modbus Exception:", e)
+        except PermissionError as e:
+            # Handle permission error
+            print("Permission Error:", e)
         except Exception as e:
-            print("Exception: ", e)
+            # Handle other exceptions
+            print("Exception:", e)
             self.connected = False
 
     def write_VFD(self, user_input, entry_to_change):
+        speed_set = False
         if self.connected:
-            speed_set = False
             if entry_to_change == "frequency":
                 speed_package = user_inputs.set_user_frequency(user_input)
             elif entry_to_change == "spindle":
@@ -41,8 +45,8 @@ class VFDModel:
             else:
                 return False
 
-        ## Send the request to the vfd
-        def send_to_vfd(register, data, function_code, decimals = 0, signed = False):
+        ## Send the request to the VFD
+        def send_to_vfd(register, data, function_code, decimals=0, signed=False):
             if self.connected:
                 with lock:
                     try:
@@ -50,6 +54,9 @@ class VFDModel:
                     except minimalmodbus.ModbusException as e:
                         # Handle modbus communication error
                         print("Modbus Exception:", e)
+                    except PermissionError as e:
+                        # Handle permission error
+                        print("Permission Error:", e)
                     except Exception as e:
                         # Handle other exceptions
                         print("Exception:", e)
@@ -65,7 +72,7 @@ class VFDModel:
             send_to_vfd(MB.SET_FREQUENCY, speed_package, MB.WRITE_SINGLE_REGISTER)
 #            print("Attempting to set security bit to true")
             send_to_vfd(MB.COMMAND_DRIVE, MB.COMMAND_DRIVE_SECURITY_BIT, MB.WRITE_SINGLE_REGISTER)
-            # DEBUG so that command prompt does not immediately dissapear
+            # DEBUG so that command prompt does not immediately disappear
             # input()
         return True
 
@@ -81,6 +88,9 @@ class VFDModel:
                 except minimalmodbus.ModbusException as e:
                     # Handle modbus communication error
                     print("Modbus Exception:", e)
+                except PermissionError as e:
+                    # Handle permission error
+                    print("Permission Error:", e)
                 except Exception as e:
                     # Handle other exceptions
                     print("Exception:", e)
