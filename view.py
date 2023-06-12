@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import font
 from tkinter import messagebox
-import tempfile, base64, zlib
+import tempfile
+import base64
+import zlib
 import re
 
 # Create transparent icon to replace the default

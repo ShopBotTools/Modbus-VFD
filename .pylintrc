@@ -8,3 +8,4 @@ disable =
     C0301, # line-too-long
     W0511, # no-TODO
     W0718, # Too general exception
+    W0613, # Unused arguments
