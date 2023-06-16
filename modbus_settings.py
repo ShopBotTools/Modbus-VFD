@@ -48,6 +48,7 @@ def get_com_port():
             com_port = match.group(1)
             # Check if it is the correct port by sending a modbus read request
             if is_modbus_vfd_controller(com_port):
+                print(f"Connecting to {com_port}")
                 return com_port
 
     return None
@@ -64,6 +65,10 @@ def is_modbus_vfd_controller(com_port):
         vfd.clear_buffers_before_each_transaction = CLEAR_BUFFERS_BEFORE_CALL
         vfd.close_port_after_each_call = CLEAR_BUFFERS_AFTER_CALL
         vfd.debug = DEBUG
+        # Read data from the device
+        data = vfd.read_registers(READ_FREQUENCY, READ_LENGTH, READ_REGISTER)
+        return True
+
     except minimalmodbus.ModbusException as e:
         # Handle modbus communication error
         print("Modbus Exception:", e)
@@ -73,20 +78,14 @@ def is_modbus_vfd_controller(com_port):
     except Exception as e:
         # Handle other exceptions
         print("Exception:", e)
-    with lock:
-        try:
-            # Read data from the device
-            data = vfd.read_registers(READ_FREQUENCY, READ_LENGTH, READ_REGISTER)
-            return data
-
-        except minimalmodbus.ModbusException as e:
-            # Handle modbus communication error
-            print("Modbus Exception:", e)
-        except PermissionError as e:
-            # Handle permission error
-            print("Permission Error:", e)
-        except Exception as e:
-            # Handle other exceptions
-            print("Exception:", e)
+    except minimalmodbus.ModbusException as e:
+        # Handle modbus communication error
+        print("Modbus Exception:", e)
+    except PermissionError as e:
+        # Handle permission error
+        print("Permission Error:", e)
+    except Exception as e:
+        # Handle other exceptions
+        print("Exception:", e)
 
 COM_PORT = get_com_port()
