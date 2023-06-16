@@ -1,7 +1,31 @@
 # Set the Modbus paramaters in here for both reading and writing to the VFD
 # General Modbus Settings
-import re
+import serial
 import serial.tools.list_ports
+import re
+from pymodbus.client.sync import ModbusSerialClient
+
+def is_modbus_vfd_controller(com_port):
+    # Create a Modbus client
+    client = ModbusSerialClient(method='rtu', port=com_port, baudrate=9600)
+
+    try:
+        # Connect to the Modbus device
+        if client.connect():
+            # Send a simple read request to address 0
+            response = client.read_holding_registers(0, 1, unit=1)
+            if response.isError():
+                # Modbus read request was unsuccessful
+                return False
+            else:
+                # Modbus read request was successful
+                return True
+        else:
+            # Failed to connect to the Modbus device
+            return False
+    finally:
+        # Close the Modbus client
+        client.close()
 
 def get_com_port():
     # Get a list of all available ports
@@ -11,10 +35,12 @@ def get_com_port():
     for port in available_ports:
         match = re.match(pattern, port.description)
         if match:
-            return match.group(1)
+            com_port = match.group(1)
+            # Check if it is the correct port by sending a modbus read request
+            if is_modbus_vfd_controller(com_port):
+                return com_port
 
     return None
-
 
 MB_ADDRESS = 3                          # Station Address
 COM_PORT = get_com_port()
