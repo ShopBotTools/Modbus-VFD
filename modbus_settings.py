@@ -2,22 +2,15 @@
 # General Modbus Settings
 import re
 import serial.tools.list_ports
+import configparser
 
-def get_com_port():
-    # Get a list of all available ports
-    available_ports = list(serial.tools.list_ports.comports())
+config = configparser.ConfigParser()
+config.read('config.ini')
+# Use the value of the 'COM' key in the 'Serial' section of the config file
+com_port = config.get('Serial', 'COM')
 
-    pattern = r"ShopBot Controller \((COM\d+)\)"
-    for port in available_ports:
-        match = re.match(pattern, port.description)
-        if match:
-            return match.group(1)
-
-    return None
-
-
+COM_PORT = com_port
 MB_ADDRESS = 3                          # Station Address
-COM_PORT = get_com_port()
 BAUDRATE = 9600                         # BAUDRATE
 BYTESIZE = 8                            # Number of data bits to be requested
 STOPBITS = 1                            # Number of stop bits
