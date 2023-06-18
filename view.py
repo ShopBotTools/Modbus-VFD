@@ -87,28 +87,19 @@ class VFDView:
 
         self.root.geometry(f"{width}x{height}+{x}+{y}")
 
-        # Column 1, Keys
+        ############################### Row 1 ###############################
         self.spindle_label = tk.Label(self.root, text="Spindle Speed", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.spindle_label.grid(row=1, column=0, padx=self.X_PADDING)
 
-        self.load_label = tk.Label(self.root, text="Spindle Load", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
-        self.load_label.grid(row=2, column=0, padx=self.X_PADDING)
-
-        # Column 2, Values
         self.spindle_value = tk.Label(self.root, textvariable=self.label_vars["spindle_speed"], bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.spindle_value.grid(row=1, column=1, padx=self.X_PADDING)
-
-        self.load_value = tk.Label(self.root, textvariable=self.label_vars["load"], bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
-        self.load_value.grid(row=2, column=1, padx=self.X_PADDING)
-
-        self.load_progress = ttk.Progressbar(self.root, orient="horizontal", mode="determinate", length=self.LOAD_BAR_SIZE)
-        self.load_progress.grid(row=2, column=2, padx=self.X_PADDING, pady=self.Y_PADDING)
 
         # Create an entry widget for manual input of spindle speed value
         self.spindle_entry = tk.Entry(self.root, bg=self.FONT_BACKGROUND, font=self.FONT_SIZE, width=6, validate="key")
         self.spindle_entry.config(validatecommand=(self.spindle_entry.register(validate_entry), '%P'))
         self.spindle_entry.grid(row=1, column=2, padx=self.X_PADDING, sticky="w")
 
+        # Bind actions to the entry widget
         def on_return(event):
             self.set_spindle()
         self.spindle_entry.bind('<Return>', on_return)
@@ -122,9 +113,41 @@ class VFDView:
         self.set_spindle_button.config(font=self.FONT_SIZE)
         self.set_spindle_button.grid(row=1, column=2, padx=self.X_PADDING, sticky="e")  # Set sticky parameter to "w" for left alignment)
 
+        # Override label
+        self.override_label = tk.Label(self.root, text="Override", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
+        self.override_label.grid(row=1, column=3, padx=self.X_PADDING, sticky="e")
+
+        # Increment dropdown menu
+        self.adjustment_dropdown = tk.OptionMenu(self.root, self.selected_adjustment, *self.selected_adjustment_options)
+        self.adjustment_dropdown.config(font=self.FONT_SIZE)
+        self.adjustment_dropdown.grid(row=1, column=4, padx=5, sticky="e")
+
+        # Decrement, - button
+        self.decrement_button = tk.Button(self.root, text="  -  ", command=self.decrement_spindle)
+        self.decrement_button.config(font=self.FONT_SIZE)
+        self.decrement_button.grid(row=1, column=5, padx=0, sticky="w")
+        self.root.bind('-', self.decrement_spindle)
+
+        # Increment, + button
+        self.increment_button = tk.Button(self.root, text="  +  ", command=self.increment_spindle)
+        self.increment_button.config(font=self.FONT_SIZE)
+        self.increment_button.grid(row=1, column=5, padx=50)
+        self.root.bind('=', self.increment_spindle)
+
+        ############################### Row 2 ###############################
+        self.load_label = tk.Label(self.root, text="Spindle Load", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
+        self.load_label.grid(row=2, column=0, padx=self.X_PADDING)
+
+        self.load_value = tk.Label(self.root, textvariable=self.label_vars["load"], bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
+        self.load_value.grid(row=2, column=1, padx=self.X_PADDING)
+
+        self.load_progress = ttk.Progressbar(self.root, orient="horizontal", mode="determinate", length=self.LOAD_BAR_SIZE)
+        self.load_progress.grid(row=2, column=2, padx=self.X_PADDING, pady=self.Y_PADDING)
+
         # COM Port selection dropdown menu
         self.com_port_label = tk.Label(self.root, text="COM Port", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
         self.com_port_label.grid(row=2, column=3, padx=self.X_PADDING, sticky="e")
+
         self.com_port_dropdown = tk.OptionMenu(self.root, self.selected_com_port, *self.com_ports)
         self.com_port_dropdown.config(font=10)
         self.com_port_dropdown.grid(row=2, column=4, padx=self.X_PADDING, pady=self.Y_PADDING, sticky="e")
@@ -133,27 +156,6 @@ class VFDView:
         self.connect_button = tk.Button(self.root, text="Connect", command=self.connect)
         self.connect_button.config(font=self.FONT_SIZE)
         self.connect_button.grid(row=2, column=5, padx=self.X_PADDING, sticky="w")
-
-        # Decrement, - button
-        self.decrement_button = tk.Button(self.root, text="  -  ", command=self.decrement_spindle)
-        self.decrement_button.config(font=self.FONT_SIZE)
-        self.decrement_button.grid(row=1, column=5, padx=0, sticky="w")
-        self.root.bind('-', self.decrement_spindle)
-
-        # Increment dropdown menu
-        self.adjustment_dropdown = tk.OptionMenu(self.root, self.selected_adjustment, *self.selected_adjustment_options)
-        self.adjustment_dropdown.config(font=self.FONT_SIZE)
-        self.adjustment_dropdown.grid(row=1, column=4, padx=5, sticky="e")
-
-        # Increment, + button
-        self.increment_button = tk.Button(self.root, text="  +  ", command=self.increment_spindle)
-        self.increment_button.config(font=self.FONT_SIZE)
-        self.increment_button.grid(row=1, column=5, padx=50)
-        self.root.bind('=', self.increment_spindle)
-
-        # Override label
-        self.override_label = tk.Label(self.root, text="Override", bg=self.FONT_BACKGROUND, font=self.FONT_SIZE)
-        self.override_label.grid(row=1, column=3, padx=self.X_PADDING, sticky="e")
 
         if not self.controller.model.connected:
             self.spindle_entry.configure(state="disabled")
