@@ -1,11 +1,14 @@
 # Set the Modbus paramaters in here for both reading and writing to the VFD
 # General Modbus Settings
-import re
-import serial.tools.list_ports
 import configparser
+import os
+import sys
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+executable_dir = os.path.dirname(sys.argv[0])
+config_file = 'config.ini'
+config_path = os.path.join(executable_dir, config_file)
+config.read(config_path)
 # Use the value of the 'COM' key in the 'Serial' section of the config file
 com_port = config.get('Serial', 'COM')
 

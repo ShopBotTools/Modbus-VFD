@@ -4,6 +4,9 @@ from tkinter import font
 from tkinter import messagebox
 import tempfile, base64, zlib
 import re
+import os
+import sys
+import configparser
 
 # Create transparent icon to replace the default
 ICON = zlib.decompress(base64.b64decode('eJxjYGAEQgEBBiDJwZDBy'
@@ -60,6 +63,22 @@ class VFDView:
         self.decrement_button     = None
         self.adjustment_dropdown  = None
         self.override_label       = None
+
+    def update_config_ini(self, new_com_port):
+        # Get the directory path of the executable
+        executable_dir = os.path.dirname(sys.argv[0])
+
+        # Construct the absolute file path for config.ini
+        config_file = 'config.ini'
+        config_path = os.path.join(executable_dir, config_file)
+
+        # Update the config file with the new COM port
+        config = configparser.ConfigParser()
+        config.read(config_path)
+        config.set('Serial', 'COM', new_com_port)
+        with open(config_path, 'w') as config_file:
+            config.write(config_file)
+            print("config.ini updated with the new COM port:", new_com_port)
 
     def position_window(self, width, height):
         screen_width = self.root.winfo_screenwidth()
@@ -238,4 +257,7 @@ class VFDView:
             for var in self.label_vars.values():
                 var.set("Disconnected")
         else:
+            # Update the config.ini file with the new COM port
+            self.update_config_ini(selected_port)
+
             self.controller.read_vfd()
