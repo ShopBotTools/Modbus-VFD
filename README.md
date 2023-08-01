@@ -7,8 +7,11 @@ Build instructions:
 - cd into project folder
 - Create virtual environment:
 > python -m venv .\venv
+
+- Activate virtual environment:
 > .\venv\Scripts\activate
 
+- Install requirements:
 > pip install -r .\requirements.txt
 - Copy all .py files from workpace directory to venv\Lib\site-packages
 > pyinstaller --onefile --noconsole main.py
