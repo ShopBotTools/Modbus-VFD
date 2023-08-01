@@ -8,9 +8,10 @@ Build instructions:
 - Create virtual environment:
 > python -m venv .\venv
 > .\venv\Scripts\activate
+
 > pip install -r .\requirements.txt
 - Copy all .py files from workpace directory to venv\Lib\site-packages
-> pyinstaller --onefile --noconsole --icon=rpm.ico main.py
+> pyinstaller --onefile --noconsole main.py
 - Move dist\main.exe to workspace directory
 - Delete the files that were moved into venv\Lib\site-packages
 
